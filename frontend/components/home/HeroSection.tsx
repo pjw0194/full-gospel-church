@@ -8,12 +8,12 @@ export default function HeroSection() {
 			<div className="absolute inset-0 bg-black/50 z-0">
 				{/* Placeholder for Background Image/Video */}
 				<Image
-					src="/images/test_nature.jpg"
+					src="/images/test-nature.jpg"
 					alt="nature"
 					fill
 					className="object-cover"
 					priority
-					quality={90}
+					quality={75}
 				/>
 				<div className="absolute inset-0 bg-black/60 z-10" />
 			</div>
