@@ -12,10 +12,10 @@ export default function QuickAccess() {
 				{items.map((item, idx) => (
 					<div
 						key={idx}
-						className="bg-white p-8 rounded-xl shadow-xl hover:-translate-y-1 transition duration-300 border border-gray-100 text-center"
+						className="bg-white p-8 rounded-xl shadow-xl hover:-translate-y-1 transition duration-300 border border-gray-100 hover:border-emerald-200 text-center group"
 					>
 						<div className="text-4xl mb-4">{item.icon}</div>
-						<h3 className="text-lg font-bold text-gray-800 mb-2">
+						<h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-emerald-700 transition">
 							{item.title}
 						</h3>
 						<p className="text-gray-500 text-sm">{item.desc}</p>
