@@ -17,7 +17,10 @@ export default function NewsSection() {
 							캔사스 순복음 교회의 이야기를 전합니다.
 						</p>
 					</div>
-					<a href="/news" className="text-sm text-gray-500 hover:text-blue-600">
+					<a
+						href="/news"
+						className="text-sm text-gray-500 hover:text-emerald-600"
+					>
 						전체보기 +
 					</a>
 				</div>
@@ -31,10 +34,10 @@ export default function NewsSection() {
 								{/* 이미지 들어갈 곳 */}
 								<div className="w-full h-full bg-gray-300 group-hover:scale-105 transition duration-500" />
 							</div>
-							<span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+							<span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
 								{item.tag}
 							</span>
-							<h3 className="text-xl font-bold text-gray-900 mt-2 group-hover:text-blue-600 transition">
+							<h3 className="text-xl font-bold text-gray-900 mt-2 group-hover:text-emerald-600 transition">
 								{item.title}
 							</h3>
 							<p className="text-gray-400 text-sm mt-1">{item.date}</p>

@@ -1,3 +1,5 @@
+import { Youtube, Instagram } from "lucide-react";
+
 export default function Footer() {
 	return (
 		<footer className="bg-gray-900 text-gray-400 py-12 text-sm">
@@ -9,25 +11,26 @@ export default function Footer() {
 					<p>1234 Church Rd, Lawrence, KS 66044</p>
 					<p>Tel: 123-456-7890 | Email: info@kansaschurch.com</p>
 				</div>
-				<div className="flex gap-4">
-					<a href="#" className="hover:text-white transition">
-						Youtube
-					</a>
-					<a href="#" className="hover:text-white transition">
-						Instagram
-					</a>
-					{/* 관리자 페이지 링크는 눈에 띄지 않게 처리 */}
+				<div className="flex space-x-4">
 					<a
-						href="http://localhost:8000/admin"
-						target="_blank"
-						className="hover:text-white transition opacity-50"
+						href="#"
+						className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-110"
+						aria-label="Youtube"
 					>
-						Admin
+						<Youtube size={18} />
+					</a>
+					<a
+						href="#"
+						className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-110"
+						aria-label="Instagram"
+					>
+						<Instagram size={18} />
 					</a>
 				</div>
 			</div>
 			<div className="border-t border-gray-800 mt-8 pt-8 text-center text-xs">
-				&copy; 2025 Kansas Full Gospel Church. All rights reserved.
+				&copy; {new Date().getFullYear()} Kansas Full Gospel Church. All rights
+				reserved.
 			</div>
 		</footer>
 	);

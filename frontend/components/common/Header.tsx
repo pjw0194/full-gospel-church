@@ -9,22 +9,25 @@ export default function Header() {
 					href="/"
 					className="text-xl font-bold text-gray-800 tracking-tight"
 				>
-					CHURCH <span className="text-blue-600">LOGO</span>
+					CHURCH <span className="text-emerald-600">LOGO</span>
 				</Link>
 				{/* 메뉴 영역 (PC 버전) */}
 				<nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
-					<Link href="/about" className="hover:text-blue-600 transition-colors">
+					<Link
+						href="/about"
+						className="hover:text-emerald-600 transition-colors"
+					>
 						교회소개
 					</Link>
 					<Link
 						href="/sermons"
-						className="hover:text-blue-600 transition-colors"
+						className="hover:text-emerald-600 transition-colors"
 					>
 						예배/설교
 					</Link>
 					<Link
 						href="/location"
-						className="hover:text-blue-600 transition-colors"
+						className="hover:text-emerald-600 transition-colors"
 					>
 						오시는길
 					</Link>
