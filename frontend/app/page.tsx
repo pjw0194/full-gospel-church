@@ -5,10 +5,7 @@ import QuickAccess from "@/components/home/QuickAccess";
 import LatestSermon from "@/components/home/LatestSermon";
 import NewsSection from "@/components/home/NewsSection";
 import DailyVerse from "@/components/home/DailyVerse";
-
-interface HelloResponse {
-	message: string;
-}
+import WorshipSchedule from "@/components/home/WorshipSchedule";
 
 export default async function Home() {
 	return (
@@ -17,6 +14,7 @@ export default async function Home() {
 			<QuickAccess />
 			<DailyVerse />
 			<LatestSermon />
+			<WorshipSchedule />
 			<NewsSection />
 		</main>
 	);

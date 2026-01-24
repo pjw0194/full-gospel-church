@@ -1,7 +1,7 @@
 export default function QuickAccess() {
 	const items = [
 		{ title: "예배 시간", desc: "주일 대예배 11:00 AM", icon: "🕒" },
-		{ title: "오시는 길", desc: "캔사스 000번지", icon: "📍" }, // 구글맵 링크 연결
+		{ title: "오시는 길", desc: "1424 S 55th St, KS 66106", icon: "📍" }, // 구글맵 링크 연결
 		{ title: "주보 보기", desc: "이번 주 소식 다운로드", icon: "📄" },
 		{ title: "온라인 헌금", desc: "마음을 드리는 곳", icon: "🙏" },
 	];
