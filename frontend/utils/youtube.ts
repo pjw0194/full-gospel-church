@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 
-const PLAYLIST_ID = "PLJ1pbNfyrkV6vrkC1WUidsomfE4AkOJzl";
+const PLAYLIST_ID = "PLJ1pbNfyrkV5YJu7Erl6OmGUJFpyPbOR8";
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
 
 export interface SermonData {
@@ -27,30 +27,30 @@ export async function getLatestSermon(): Promise<SermonData | null> {
 
 		const videoId = entry["yt:videoId"];
 		const fullTitle = entry.title;
-        const parts = fullTitle.split("|").map((s: string) => s.trim());
-        
-        // Default to raw title if format doesn't match
-        let title = fullTitle;
-        let description = "";
-        let date = new Date(entry.published).toLocaleDateString("ko-KR", {
+		const parts = fullTitle.split("|").map((s: string) => s.trim());
+
+		// Default to raw title if format doesn't match
+		let title = fullTitle;
+		let description = "";
+		let date = new Date(entry.published).toLocaleDateString("ko-KR", {
 			year: "numeric",
 			month: "long",
 			day: "numeric",
 		});
 
-        // Parse format: Date | Service Type | Title | Verse | Preacher
-        if (parts.length >= 5) {
-             title = parts[2]; // Title is the 3rd part
-             const verse = parts[3];
-             const preacher = parts[4];
-             // Override date from title if available (1st part)
-             date = parts[0]; 
-             
-             description = `본문: ${verse}\n설교자: ${preacher}`;
-        } else if (entry["media:group"]["media:description"]) {
-             // Fallback to YouTube description if title format is different
-             description = entry["media:group"]["media:description"];
-        }
+		// Parse format: Date | Service Type | Title | Verse | Preacher
+		if (parts.length >= 5) {
+			title = parts[2]; // Title is the 3rd part
+			const verse = parts[3];
+			const preacher = parts[4];
+			// Override date from title if available (1st part)
+			date = parts[0];
+
+			description = `본문: ${verse}\n설교자: ${preacher}`;
+		} else if (entry["media:group"]["media:description"]) {
+			// Fallback to YouTube description if title format is different
+			description = entry["media:group"]["media:description"];
+		}
 
 		return {
 			id: videoId,

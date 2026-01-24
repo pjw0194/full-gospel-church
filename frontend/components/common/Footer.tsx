@@ -8,8 +8,8 @@ export default function Footer() {
 					<h3 className="text-white font-bold text-lg mb-2">
 						캔사스 순복음 교회
 					</h3>
-					<p>1234 Church Rd, Lawrence, KS 66044</p>
-					<p>Tel: 123-456-7890 | Email: info@kansaschurch.com</p>
+					<p>1424 S 55th St, Kansas City, KS 66106</p>
+					<p>Tel: 913-788-8828 | Email: kansasfgc@gmail.com</p>
 				</div>
 				<div className="flex space-x-4">
 					<a
@@ -29,8 +29,7 @@ export default function Footer() {
 				</div>
 			</div>
 			<div className="border-t border-gray-800 mt-8 pt-8 text-center text-xs">
-				&copy; {new Date().getFullYear()} Kansas Full Gospel Church. All rights
-				reserved.
+				&copy; 2026 Kansas Full Gospel Church. All rights reserved.
 			</div>
 		</footer>
 	);

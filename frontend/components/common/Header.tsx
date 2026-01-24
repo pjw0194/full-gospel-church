@@ -7,9 +7,14 @@ export default function Header() {
 				{/* logo area */}
 				<Link
 					href="/"
-					className="text-xl font-bold text-gray-800 tracking-tight"
+					className="flex flex-col items-start leading-none"
 				>
-					CHURCH <span className="text-emerald-600">LOGO</span>
+					<span className="text-lg md:text-xl font-bold text-gray-800 tracking-tight">
+						캔사스 <span className="text-emerald-600">순복음 교회</span>
+					</span>
+					<span className="text-[9px] md:text-[10px] text-gray-400 font-medium uppercase tracking-tighter mt-1">
+						Kansas Full Gospel Korean Church
+					</span>
 				</Link>
 				{/* 메뉴 영역 (PC 버전) */}
 				<nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
