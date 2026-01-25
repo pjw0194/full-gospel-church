@@ -1,5 +1,12 @@
 import React from "react";
-import { History, Globe, ShieldCheck, Zap, Sparkles, Quote } from "lucide-react";
+import {
+	History,
+	Globe,
+	ShieldCheck,
+	Zap,
+	Sparkles,
+	Quote,
+} from "lucide-react";
 
 export default function AboutPage() {
 	return (
@@ -20,7 +27,8 @@ export default function AboutPage() {
 					<p className="max-w-2xl mx-auto text-stone-500 text-lg leading-relaxed">
 						캔사스 지역에서 가장 오래된 한인교회로서,
 						<br />
-						정통 복음주의를 바탕으로 오순절 성령 운동에 매진해 온 믿음의 터전입니다.
+						정통 복음주의를 바탕으로 오순절 성령 운동에 매진해 온 믿음의
+						터전입니다.
 					</p>
 				</div>
 			</section>
@@ -64,9 +72,10 @@ export default function AboutPage() {
 									이후, 기도를 통한 영적 도약과 새로운 성장을 이루고 있습니다.
 								</p>
 								<p>
-									비록 지난 48년의 역사 속에 여러 어려움도 있었으나, 하나님께서는
-									늘 우리를 선한 길로 인도하셨습니다. 이제 여의도순복음교회의
-									전폭적인 후원과 기도로 더 큰 은혜의 부흥을 꿈꿉니다.
+									비록 지난 48년의 역사 속에 여러 어려움도 있었으나,
+									하나님께서는 늘 우리를 선한 길로 인도하셨습니다. 이제
+									여의도순복음교회의 전폭적인 후원과 기도로 더 큰 은혜의 부흥을
+									꿈꿉니다.
 								</p>
 								<p className="font-medium text-emerald-700">
 									국적과 나이, 인종을 초월하여 하나님의 사랑 안에서 하나 되는
@@ -166,8 +175,8 @@ export default function AboutPage() {
 											<ShieldCheck className="text-emerald-400" />
 										</div>
 										<p className="text-stone-300">
-											이영훈 담임목사님의 전폭적인 기도와 후원으로 든든하게 세워져
-											갑니다.
+											이영훈 담임목사님의 전폭적인 기도와 후원으로 든든하게
+											세워져 갑니다.
 										</p>
 									</div>
 									<div className="flex space-x-4">
@@ -200,7 +209,7 @@ export default function AboutPage() {
 								<div className="space-y-4">
 									<div className="flex justify-between items-center py-3 border-b border-white/10">
 										<span className="text-stone-400 text-sm">상담 및 문의</span>
-										<span className="font-bold">913-912-2591</span>
+										<span className="font-bold">913-788-8828</span>
 									</div>
 									<div className="flex justify-between items-center py-3 border-b border-white/10">
 										<span className="text-stone-400 text-sm">카카오톡</span>
