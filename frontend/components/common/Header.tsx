@@ -3,13 +3,24 @@
 import { useState } from "react";
 import TransitionLink from "@/components/common/TransitionLink";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const pathname = usePathname();
 
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen);
 	};
+
+	const isActive = (path: string) => pathname === path;
+
+	const navItems = [
+		{ href: "/", label: "홈" },
+		{ href: "/about", label: "교회소개" },
+		{ href: "/sermons", label: "예배/설교" },
+		{ href: "/location", label: "오시는길" },
+	];
 
 	return (
 		<header className="w-full h-16 bg-white border-b border-gray-100 flex items-center justify-center fixed top-0 z-50">
@@ -27,26 +38,22 @@ export default function Header() {
 						Kansas Full Gospel Korean Church
 					</span>
 				</TransitionLink>
+
 				{/* 메뉴 영역 (PC 버전) */}
 				<nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
-					<TransitionLink
-						href="/about"
-						className="hover:text-emerald-600 transition-colors"
-					>
-						교회소개
-					</TransitionLink>
-					<TransitionLink
-						href="/sermons"
-						className="hover:text-emerald-600 transition-colors"
-					>
-						예배/설교
-					</TransitionLink>
-					<TransitionLink
-						href="/location"
-						className="hover:text-emerald-600 transition-colors"
-					>
-						오시는길
-					</TransitionLink>
+					{navItems.map((item) => (
+						<TransitionLink
+							key={item.href}
+							href={item.href}
+							className={`transition-colors ${
+								isActive(item.href)
+									? "text-emerald-600 font-bold"
+									: "hover:text-emerald-600"
+							}`}
+						>
+							{item.label}
+						</TransitionLink>
+					))}
 				</nav>
 
 				{/* 모바일 메뉴 버튼 */}
@@ -67,27 +74,20 @@ export default function Header() {
 						: "opacity-0 -translate-y-5 invisible"
 				}`}
 			>
-				<TransitionLink
-					href="/about"
-					className="text-gray-800 font-medium hover:text-emerald-600 text-lg"
-					onClick={() => setIsMenuOpen(false)}
-				>
-					교회소개
-				</TransitionLink>
-				<TransitionLink
-					href="/sermons"
-					className="text-gray-800 font-medium hover:text-emerald-600 text-lg"
-					onClick={() => setIsMenuOpen(false)}
-				>
-					예배/설교
-				</TransitionLink>
-				<TransitionLink
-					href="/location"
-					className="text-gray-800 font-medium hover:text-emerald-600 text-lg"
-					onClick={() => setIsMenuOpen(false)}
-				>
-					오시는길
-				</TransitionLink>
+				{navItems.map((item) => (
+					<TransitionLink
+						key={item.href}
+						href={item.href}
+						className={`text-lg font-medium transition-colors ${
+							isActive(item.href)
+								? "text-emerald-600 font-bold"
+								: "text-gray-800 hover:text-emerald-600"
+						}`}
+						onClick={() => setIsMenuOpen(false)}
+					>
+						{item.label}
+					</TransitionLink>
+				))}
 			</div>
 		</header>
 	);
