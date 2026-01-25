@@ -3,7 +3,6 @@ import axios from "axios";
 import HeroSection from "@/components/home/HeroSection";
 import QuickAccess from "@/components/home/QuickAccess";
 import LatestSermon from "@/components/home/LatestSermon";
-import NewsSection from "@/components/home/NewsSection";
 import DailyVerse from "@/components/home/DailyVerse";
 import WorshipSchedule from "@/components/home/WorshipSchedule";
 
@@ -16,7 +15,6 @@ export default async function Home() {
 				<DailyVerse />
 				<LatestSermon />
 				<WorshipSchedule />
-				<NewsSection />
 			</div>
 		</main>
 	);

@@ -8,7 +8,7 @@ export default function WorshipSchedule() {
 	];
 
 	return (
-		<section className="py-20 bg-white">
+		<section id="worship-schedule" className="py-20 bg-white">
 			<div className="container mx-auto px-4 max-w-4xl">
 				<div className="text-center mb-12">
 					<h2 className="text-3xl font-bold text-gray-900">예배 및 모임 안내</h2>

@@ -1,25 +1,62 @@
+"use client";
+
+import React from "react";
+import { Clock, MapPin, FileText } from "lucide-react";
+
 export default function QuickAccess() {
-	const items = [
-		{ title: "예배 시간", desc: "주일 대예배 11:00 AM", icon: "🕒" },
-		{ title: "오시는 길", desc: "1424 S 55th St, KS 66106", icon: "📍" }, // 구글맵 링크 연결
-		{ title: "주보 보기", desc: "이번 주 소식 다운로드", icon: "📄" },
-		{ title: "온라인 헌금", desc: "마음을 드리는 곳", icon: "🙏" },
+	const handleScroll = (
+		e: React.MouseEvent<HTMLAnchorElement>,
+		href: string
+	) => {
+		if (href.startsWith("#")) {
+			e.preventDefault();
+			const targetId = href.replace("#", "");
+			const elem = document.getElementById(targetId);
+			if (elem) {
+				elem.scrollIntoView({ behavior: "smooth", block: "center" });
+			}
+		}
+	};
+
+	const infoItems = [
+		{
+			icon: <Clock className="text-emerald-600" size={28} />,
+			title: "예배 시간",
+			description: "주일 11:00 / 수요 20:00",
+			link: "#worship-schedule",
+		},
+		{
+			icon: <MapPin className="text-emerald-600" size={28} />,
+			title: "오시는 길",
+			description: "1424 S 55th St, Kansas City, KS 66106",
+			link: "/location",
+		},
+		{
+			icon: <FileText className="text-emerald-600" size={28} />,
+			title: "주보 보기",
+			description: "이번 주 교회 소식",
+			link: "/bulletin",
+		},
 	];
 
 	return (
-		<section className="py-16 bg-white relative -mt-10 z-20 container mx-auto px-4 rounded-2xl">
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-				{items.map((item, idx) => (
-					<div
+		<section className="container mx-auto px-4 relative -mt-20 z-20">
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-0 shadow-2xl rounded-2xl overflow-hidden bg-white border border-gray-100">
+				{infoItems.map((item, idx) => (
+					<a
 						key={idx}
-						className="bg-white p-8 rounded-xl shadow-xl hover:-translate-y-1 transition duration-300 border border-gray-100 hover:border-emerald-200 text-center group"
+						href={item.link}
+						onClick={(e) => handleScroll(e, item.link)}
+						className="flex flex-col items-center justify-center p-10 text-center transition-all duration-300 hover:bg-stone-50 group border-b md:border-b-0 md:border-r last:border-0 border-stone-100 cursor-pointer"
 					>
-						<div className="text-4xl mb-4">{item.icon}</div>
-						<h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-emerald-700 transition">
+						<div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
+							{item.icon}
+						</div>
+						<h3 className="text-lg font-bold text-gray-800 mb-1">
 							{item.title}
 						</h3>
-						<p className="text-gray-500 text-sm">{item.desc}</p>
-					</div>
+						<p className="text-sm text-stone-500">{item.description}</p>
+					</a>
 				))}
 			</div>
 		</section>
