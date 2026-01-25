@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
 	return (
-		<section className="relative h-[70vh] w-full flex items-center justify-center bg-gray-900 text-white overflow-hidden">
+		<section className="sticky top-0 z-0 h-[70vh] w-full flex items-center justify-center bg-gray-900 text-white overflow-hidden">
 			{/* 배경 이미지 (실제로는 Image 컴포넌트나 video 태그 사용) */}
 			<div className="absolute inset-0 bg-black/50 z-0">
 				{/* Placeholder for Background Image/Video */}
