@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
+import PageTransition from "@/components/common/PageTransition";
+import TransitionProvider from "@/components/common/TransitionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +21,13 @@ export default function RootLayout({
 	return (
 		<html lang="ko">
 			<body className={inter.className}>
-				<Header />
-				<div className="pt-16">{children}</div>
-				<Footer />
+				<TransitionProvider>
+					<Header />
+					<div className="pt-16">
+						<PageTransition>{children}</PageTransition>
+					</div>
+					<Footer />
+				</TransitionProvider>
 			</body>
 		</html>
 	);

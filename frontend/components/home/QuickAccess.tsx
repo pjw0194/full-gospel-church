@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import TransitionLink from "@/components/common/TransitionLink";
 import { Clock, MapPin, FileText } from "lucide-react";
 
 export default function QuickAccess() {
@@ -43,7 +44,7 @@ export default function QuickAccess() {
 		<section className="container mx-auto px-4 relative -mt-20 z-20">
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-0 shadow-2xl rounded-2xl overflow-hidden bg-white border border-gray-100">
 				{infoItems.map((item, idx) => (
-					<a
+					<TransitionLink
 						key={idx}
 						href={item.link}
 						onClick={(e) => handleScroll(e, item.link)}
@@ -56,7 +57,7 @@ export default function QuickAccess() {
 							{item.title}
 						</h3>
 						<p className="text-sm text-stone-500">{item.description}</p>
-					</a>
+					</TransitionLink>
 				))}
 			</div>
 		</section>

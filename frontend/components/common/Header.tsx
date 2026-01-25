@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import TransitionLink from "@/components/common/TransitionLink";
 import { Menu, X } from "lucide-react";
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
 		<header className="w-full h-16 bg-white border-b border-gray-100 flex items-center justify-center fixed top-0 z-50">
 			<div className="w-full max-w-5xl px-4 flex justify-between items-center">
 				{/* logo area */}
-				<Link
+				<TransitionLink
 					href="/"
 					className="flex flex-col items-start leading-none"
 					onClick={() => setIsMenuOpen(false)}
@@ -26,27 +26,27 @@ export default function Header() {
 					<span className="text-[9px] md:text-[10px] text-gray-400 font-medium uppercase tracking-tighter mt-1">
 						Kansas Full Gospel Korean Church
 					</span>
-				</Link>
+				</TransitionLink>
 				{/* 메뉴 영역 (PC 버전) */}
 				<nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
-					<Link
+					<TransitionLink
 						href="/about"
 						className="hover:text-emerald-600 transition-colors"
 					>
 						교회소개
-					</Link>
-					<Link
+					</TransitionLink>
+					<TransitionLink
 						href="/sermons"
 						className="hover:text-emerald-600 transition-colors"
 					>
 						예배/설교
-					</Link>
-					<Link
+					</TransitionLink>
+					<TransitionLink
 						href="/location"
 						className="hover:text-emerald-600 transition-colors"
 					>
 						오시는길
-					</Link>
+					</TransitionLink>
 				</nav>
 
 				{/* 모바일 메뉴 버튼 */}
@@ -67,27 +67,27 @@ export default function Header() {
 						: "opacity-0 -translate-y-5 invisible"
 				}`}
 			>
-				<Link
+				<TransitionLink
 					href="/about"
 					className="text-gray-800 font-medium hover:text-emerald-600 text-lg"
 					onClick={() => setIsMenuOpen(false)}
 				>
 					교회소개
-				</Link>
-				<Link
+				</TransitionLink>
+				<TransitionLink
 					href="/sermons"
 					className="text-gray-800 font-medium hover:text-emerald-600 text-lg"
 					onClick={() => setIsMenuOpen(false)}
 				>
 					예배/설교
-				</Link>
-				<Link
+				</TransitionLink>
+				<TransitionLink
 					href="/location"
 					className="text-gray-800 font-medium hover:text-emerald-600 text-lg"
 					onClick={() => setIsMenuOpen(false)}
 				>
 					오시는길
-				</Link>
+				</TransitionLink>
 			</div>
 		</header>
 	);
