@@ -6,7 +6,7 @@ import { Clock, MapPin, FileText } from "lucide-react";
 export default function QuickAccess() {
 	const handleScroll = (
 		e: React.MouseEvent<HTMLAnchorElement>,
-		href: string
+		href: string,
 	) => {
 		if (href.startsWith("#")) {
 			e.preventDefault();
@@ -22,7 +22,7 @@ export default function QuickAccess() {
 		{
 			icon: <Clock className="text-emerald-600" size={28} />,
 			title: "예배 시간",
-			description: "주일 11:00 / 수요 20:00",
+			description: "주일예배 10:45",
 			link: "#worship-schedule",
 		},
 		{
