@@ -1,4 +1,4 @@
-import Link from "next/link";
+import TransitionLink from "@/components/common/TransitionLink";
 import Image from "next/image";
 
 export default function HeroSection() {
@@ -29,18 +29,18 @@ export default function HeroSection() {
 					행복한 믿음의 공동체
 				</h1>
 				<div className="flex flex-col sm:flex-row gap-4 justify-center">
-					<Link
+					<TransitionLink
 						href="/about"
 						className="px-8 py-3 bg-white text-gray-900 font-bold rounded-full hover:bg-gray-100 transition shadow-lg"
 					>
 						교회 소개
-					</Link>
-					<Link
+					</TransitionLink>
+					<TransitionLink
 						href="/worship"
 						className="px-8 py-3 border-2 border-white text-white font-bold rounded-full hover:bg-white/10 transition"
 					>
 						예배 안내
-					</Link>
+					</TransitionLink>
 				</div>
 			</div>
 			{/* Scroll indicator */}
