@@ -7,7 +7,7 @@ import {
 	YouTubePlaylistItem,
 } from "@/types";
 
-const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+const API_KEY = process.env.YOUTUBE_API_KEY;
 const PLAYLIST_ID = "PLJ1pbNfyrkV5YJu7Erl6OmGUJFpyPbOR8";
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
 const BASE_URL = "https://www.googleapis.com/youtube/v3/playlistItems";
