@@ -175,7 +175,7 @@ export default function AboutPage() {
 											<ShieldCheck className="text-emerald-400" />
 										</div>
 										<p className="text-stone-300">
-											이영훈 담임목사님의 전폭적인 기도와 후원으로 든든하게
+											권세열 담임목사님의 전폭적인 기도와 후원으로 든든하게
 											세워져 갑니다.
 										</p>
 									</div>
