@@ -1,16 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDailyVerse, BibleVerse } from "@/data/verses";
+import { getDailyVerse } from "@/lib/verses";
+import { BibleVerse } from "@/types";
 import { Sparkles } from "lucide-react";
 
-interface VerseData {
-	text: string;
-	ref: string;
-}
-
 export default function DailyVerse() {
-	const [verse, setVerse] = useState<VerseData | null>(null);
+	const [verse, setVerse] = useState<BibleVerse | null>(null);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {

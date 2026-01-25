@@ -7,7 +7,7 @@ import Footer from "@/components/common/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "우리 교회",
+	title: "캔사스 순복음 교회",
 	description: "환영합니다.",
 };
 

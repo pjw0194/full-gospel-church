@@ -1,7 +1,4 @@
-export interface BibleVerse {
-	text: string;
-	ref: string; // Bible verse
-}
+import { BibleVerse } from "@/types";
 
 export const verses: BibleVerse[] = [
 	{

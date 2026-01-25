@@ -1,4 +1,4 @@
-import { getLatestSermon } from "@/utils/youtube";
+import { getLatestSermon } from "@/lib/youtube";
 
 export default async function LatestSermon() {
 	const sermon = await getLatestSermon();

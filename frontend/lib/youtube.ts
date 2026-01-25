@@ -1,14 +1,8 @@
 import { XMLParser } from "fast-xml-parser";
+import { SermonData } from "@/types";
 
 const PLAYLIST_ID = "PLJ1pbNfyrkV5YJu7Erl6OmGUJFpyPbOR8";
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
-
-export interface SermonData {
-	id: string;
-	title: string;
-	date: string;
-	description: string;
-}
 
 export async function getLatestSermon(): Promise<SermonData | null> {
 	try {
