@@ -11,11 +11,13 @@ export default async function Home() {
 	return (
 		<main className="flex min-h-screen flex-col">
 			<HeroSection />
-			<QuickAccess />
-			<DailyVerse />
-			<LatestSermon />
-			<WorshipSchedule />
-			<NewsSection />
+			<div className="relative z-10 bg-white">
+				<QuickAccess />
+				<DailyVerse />
+				<LatestSermon />
+				<WorshipSchedule />
+				<NewsSection />
+			</div>
 		</main>
 	);
 }
