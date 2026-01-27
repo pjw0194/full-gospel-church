@@ -5,19 +5,18 @@ import TransitionLink from "@/components/common/TransitionLink";
 import { Clock, MapPin, FileText } from "lucide-react";
 import BulletinModal from "@/components/common/BulletinModal";
 
+// Mock data for the latest bulletin (matching the structure required by BulletinModal)
+const latestBulletin = { 
+    date: "2026.01.25", 
+    title: "주일예배 주보", 
+    images: [
+        "/images/test-nature.jpg",
+        "/images/test-nature.jpg"
+    ]
+};
+
 export default function QuickAccess() {
     const [isBulletinModalOpen, setIsBulletinModalOpen] = useState(false);
-
-    // Mock data for the latest bulletin (matching the structure required by BulletinModal)
-    const latestBulletin = { 
-        date: "2026.01.25", 
-        title: "주일예배 주보",
-        images: [
-            "https://images.unsplash.com/photo-1586075010623-26c50dec77b8?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1544377193-33dcf4d68fb5?auto=format&fit=crop&q=80&w=1200"
-        ]
-    };
-
 	const handleScroll = (
 		e: React.MouseEvent<HTMLAnchorElement>,
 		href: string,
