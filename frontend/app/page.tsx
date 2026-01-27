@@ -5,6 +5,7 @@ import QuickAccess from "@/components/home/QuickAccess";
 import LatestSermon from "@/components/home/LatestSermon";
 import DailyVerse from "@/components/home/DailyVerse";
 import WorshipSchedule from "@/components/home/WorshipSchedule";
+import LocationSection from "@/components/home/LocationSection";
 
 export default async function Home() {
 	return (
@@ -15,6 +16,7 @@ export default async function Home() {
 				<DailyVerse />
 				<LatestSermon />
 				<WorshipSchedule />
+				<LocationSection />
 			</div>
 		</main>
 	);

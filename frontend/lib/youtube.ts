@@ -62,7 +62,7 @@ export async function getSermonList(
 		const url = new URL(BASE_URL);
 		url.searchParams.append("part", "snippet");
 		url.searchParams.append("playlistId", PLAYLIST_ID);
-		url.searchParams.append("maxResults", "12"); // Fetch 12 items per page
+		url.searchParams.append("maxResults", "9"); // Fetch 9 items per page
 		url.searchParams.append("key", API_KEY);
 		if (pageToken) url.searchParams.append("pageToken", pageToken);
 
