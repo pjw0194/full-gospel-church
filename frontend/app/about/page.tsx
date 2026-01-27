@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
 	History,
 	Globe,
@@ -11,12 +12,13 @@ import {
 	Star,
 	Award,
 	Calendar,
-	    User,
-	    Users,
-	    UserCheck,
-	} from "lucide-react";
-	
-	interface MemberProps {	name: string;
+	User,
+	Users,
+	UserCheck,
+} from "lucide-react";
+
+interface MemberProps {
+	name: string;
 	role: string;
 	image: string;
 	isLarge?: boolean;
@@ -34,7 +36,13 @@ const MemberCard: React.FC<MemberProps> = ({
 		<div
 			className={`relative overflow-hidden rounded-full border-4 border-white shadow-lg ${isLarge ? "w-40 h-40 md:w-56 md:h-56" : "w-32 h-32 md:w-40 md:h-40"} mb-5 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl`}
 		>
-			<img src={image} alt={name} className="w-full h-full object-cover" />
+			<Image
+				src={image}
+				alt={name}
+				fill
+				className="object-cover"
+				sizes="(max-width: 768px) 128px, 224px"
+			/>
 			<div className="absolute inset-0 bg-emerald-900/0 group-hover:bg-emerald-900/10 transition-colors" />
 		</div>
 		<h4
@@ -494,11 +502,16 @@ export default function AboutPage() {
 						<div className="relative">
 							<div className="absolute -top-10 -left-10 w-40 h-40 bg-emerald-50 rounded-full -z-10 animate-pulse" />
 							<div className="absolute -bottom-10 -right-10 w-60 h-60 bg-stone-50 rounded-full -z-10" />
-							<img
-								src="/images/members/권세열.jpg"
-								alt="Pastor Greeting"
-								className="rounded-3xl shadow-2xl z-10 relative w-full aspect-[3/4] object-cover"
-							/>
+                            <div className="relative w-full aspect-[3/4] rounded-3xl shadow-2xl z-10 overflow-hidden">
+                                <Image
+                                    src="/images/members/권세열.jpg"
+                                    alt="Pastor Greeting"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
+                                    priority
+                                />
+                            </div>
 							<div className="absolute bottom-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg z-20 border border-emerald-100">
 								<p className="text-stone-400 text-sm mb-1">Senior Pastor</p>
 								<p className="text-xl font-bold text-[#333]">권세열 담임목사</p>
@@ -876,16 +889,16 @@ export default function AboutPage() {
 			{/* Vision Point Section */}
 			<section className="py-24 bg-white">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="bg-stone-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
-						<div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
-							<img
-								src="https://images.unsplash.com/photo-1515162305285-0293e4767cc2?auto=format&fit=crop&q=80&w=1000"
-								alt="Church Interior"
-								className="w-full h-full object-cover"
-							/>
-						</div>
-						<div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-							<div>
+					                    <div className="bg-stone-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
+											<div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
+												<Image
+													src="/images/test-nature.jpg"
+													alt="Church Interior"
+													fill
+													className="object-cover"
+												/>
+											</div>
+											<div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">							<div>
 								<div className="flex items-center space-x-3 text-emerald-400 mb-6">
 									<Sparkles size={24} />
 									<span className="tracking-widest uppercase font-bold">
