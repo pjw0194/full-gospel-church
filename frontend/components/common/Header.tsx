@@ -19,7 +19,6 @@ export default function Header() {
 		{ href: "/", label: "홈" },
 		{ href: "/about", label: "교회소개" },
 		{ href: "/sermons", label: "예배/설교" },
-		{ href: "/location", label: "오시는길" },
 	];
 
 	return (
