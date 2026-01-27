@@ -25,7 +25,6 @@ export default function QuickAccess() {
         if (href === "#bulletin-modal") {
             e.preventDefault();
             setIsBulletinModalOpen(true);
-            document.body.style.overflow = 'hidden';
             return;
         }
 
@@ -41,7 +40,6 @@ export default function QuickAccess() {
 
     const closeBulletinModal = () => {
         setIsBulletinModalOpen(false);
-        document.body.style.overflow = 'unset';
     };
 
 	const infoItems = [

@@ -1,4 +1,5 @@
 import { getLatestSermon } from "@/lib/youtube";
+import TransitionLink from "@/components/common/TransitionLink";
 
 export default async function LatestSermon() {
 	const sermon = await getLatestSermon();
@@ -38,9 +39,12 @@ export default async function LatestSermon() {
 							<br />
 							<span className="block mt-2">{data.description}</span>
 						</p>
-						<button className="text-emerald-600 font-semibold hover:text-emerald-800 transition flex items-center gap-2">
+						<TransitionLink 
+							href="/sermons#video-archive"
+							className="text-emerald-600 font-semibold hover:text-emerald-800 transition flex items-center gap-2"
+						>
 							지난 설교 더보기 &rarr;
-						</button>
+						</TransitionLink>
 					</div>
 				</div>
 			</div>

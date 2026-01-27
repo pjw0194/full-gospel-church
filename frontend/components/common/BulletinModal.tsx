@@ -22,6 +22,7 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ isOpen, onClose, bulletin
 
   useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden';
       if (initialDate) {
         const idx = bulletins.findIndex(b => b.date === initialDate);
         if (idx !== -1) setSelectedIdx(idx);
@@ -29,7 +30,13 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ isOpen, onClose, bulletin
       } else {
         setSelectedIdx(0);
       }
+    } else {
+      document.body.style.overflow = 'unset';
     }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, initialDate, bulletins]);
 
   const currentBulletin = bulletins[selectedIdx];
