@@ -1,3 +1,5 @@
+"use client";
+
 import TransitionLink from "@/components/common/TransitionLink";
 import Image from "next/image";
 
@@ -36,7 +38,7 @@ export default function HeroSection() {
 						교회 소개
 					</TransitionLink>
 					<TransitionLink
-						href="/worship"
+						href="/sermons"
 						className="px-8 py-3 border-2 border-white text-white font-bold rounded-full hover:bg-white/10 transition"
 					>
 						예배 안내

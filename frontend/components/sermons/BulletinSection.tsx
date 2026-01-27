@@ -63,12 +63,10 @@ export default function BulletinSection() {
   const handleOpenModal = (date?: string) => {
     setSelectedDate(date);
     setIsBulletinModalOpen(true);
-    document.body.style.overflow = 'hidden';
   };
 
   const closeBulletinModal = () => {
     setIsBulletinModalOpen(false);
-    document.body.style.overflow = 'unset';
   };
 
   return (
