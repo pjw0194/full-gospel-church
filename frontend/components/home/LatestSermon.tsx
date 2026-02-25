@@ -14,7 +14,7 @@ export default async function LatestSermon() {
 
 	return (
 		<section className="py-20 bg-gray-50">
-			<div className="container mx-auto px-4">
+			<div className="container mx-auto px-5 sm:px-6">
 				<div className="flex flex-col md:flex-row items-center gap-10">
 					{/* 왼쪽: 설교 영상 (유튜브 임베드) */}
 					<div className="w-full md:w-3/5 aspect-video bg-black rounded-2xl shadow-2xl overflow-hidden">

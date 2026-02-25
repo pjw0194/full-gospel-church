@@ -1,0 +1,108 @@
+import { supabase, ChurchNews } from "@/lib/supabase";
+import { Calendar, Images, Newspaper } from "lucide-react";
+import Link from "next/link";
+
+export const revalidate = 60;
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export default async function NewsPage() {
+  const { data: newsList } = await supabase
+    .from("church_news")
+    .select("id, title, image_urls, created_at")
+    .order("created_at", { ascending: false });
+
+  const posts: ChurchNews[] = (newsList ?? []) as ChurchNews[];
+
+  return (
+    <main className="animate-in fade-in duration-700">
+      {/* Page Header */}
+      <section className="bg-emerald-50 pt-40 pb-24 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none font-bold text-emerald-900 translate-x-10 translate-y-16 select-none text-[8rem] sm:text-[12rem] md:text-[16rem] whitespace-nowrap">
+          NEWS
+        </div>
+        <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
+          <p className="text-emerald-600 uppercase tracking-widest text-sm mb-4">
+            Kansas Full Gospel Church
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-[#333] mb-6">
+            교회 소식
+          </h1>
+          <div className="w-16 h-1 bg-emerald-500 mx-auto rounded-full mb-8" />
+          <p className="max-w-xl mx-auto text-stone-500 text-lg leading-relaxed">
+            캔사스 순복음 교회의 최근 소식과 이야기를 전해드립니다.
+          </p>
+        </div>
+      </section>
+
+      {/* News Grid */}
+      <section className="py-12 px-8 md:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">
+          {posts.length === 0 && (
+            <div className="text-center py-32">
+              <Newspaper size={48} className="mx-auto text-stone-200 mb-6" />
+              <p className="text-stone-400 text-xl">
+                아직 등록된 소식이 없습니다.
+              </p>
+              <p className="text-stone-300 text-base mt-2">
+                곧 새로운 소식을 전해드리겠습니다.
+              </p>
+            </div>
+          )}
+
+          {posts.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+              {posts.map((post) => (
+                <Link href={`/news/${post.id}`} key={post.id}>
+                  <article className="group bg-white border border-stone-100 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full">
+                    {/* Image */}
+                    <div className="aspect-4/3 overflow-hidden bg-stone-100">
+                      {post.image_urls?.[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={post.image_urls[0]}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray50 flex items-center justify-center">
+                          <Newspaper size={28} className="text-gray-300" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div className="p-3 sm:p-4">
+                      <h2 className="font-bold text-[#333] text-sm sm:text-base leading-snug line-clamp-2 mb-2 group-hover:text-emerald-600 transition-colors">
+                        {post.title}
+                      </h2>
+                      <div className="flex items-center justify-between text-stone-400">
+                        <p className="text-xs sm:text-sm flex items-center space-x-1">
+                          <Calendar size={11} />
+                          <span>{formatDate(post.created_at)}</span>
+                        </p>
+
+                        {post.image_urls?.length > 1 && (
+                          <span className="flex gap-1 items-center text-xs sm:text-sm text-stone-300">
+                            <Images size={14} /> {post.image_urls.length}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+}

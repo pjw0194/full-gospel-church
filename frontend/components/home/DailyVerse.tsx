@@ -19,7 +19,7 @@ export default function DailyVerse() {
 	if (!verse) return null;
 
 	return (
-		<section className="max-w-5xl mx-auto px-4 py-12">
+		<section className="max-w-5xl mx-auto px-5 sm:px-6 py-12">
 			<div className="bg-emerald-50/80 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-16 text-emerald-900 relative overflow-hidden shadow-xl border border-emerald-100/50">
 				<div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
 					<Sparkles size={140} />
