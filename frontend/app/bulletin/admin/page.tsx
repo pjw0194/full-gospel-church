@@ -21,7 +21,9 @@ function formatDate(dateStr: string) {
 }
 
 export default function BulletinAdminPage() {
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [token, setToken] = useState("");
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [authError, setAuthError] = useState("");
 	const [authLoading, setAuthLoading] = useState(false);
@@ -42,14 +44,11 @@ export default function BulletinAdminPage() {
 		setAuthLoading(true);
 		setAuthError("");
 		try {
-			const res = await fetch("/api/admin/verify", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ password }),
-			});
-			if (res.status === 401) {
-				setAuthError("비밀번호가 올바르지 않습니다.");
+			const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+			if (error || !data.session) {
+				setAuthError("이메일 또는 비밀번호가 올바르지 않습니다.");
 			} else {
+				setToken(data.session.access_token);
 				setIsAuthenticated(true);
 				loadBulletins();
 			}
@@ -58,6 +57,14 @@ export default function BulletinAdminPage() {
 		} finally {
 			setAuthLoading(false);
 		}
+	};
+
+	const handleLogout = async () => {
+		await supabase.auth.signOut();
+		setIsAuthenticated(false);
+		setToken("");
+		setEmail("");
+		setPassword("");
 	};
 
 	const loadBulletins = async () => {
@@ -75,11 +82,14 @@ export default function BulletinAdminPage() {
 		setImageItems((prev) => [...prev, { key, preview, url: "", uploading: true, error: "" }]);
 
 		const formData = new FormData();
-		formData.append("password", password);
 		formData.append("file", file);
 
 		try {
-			const res = await fetch("/api/admin/bulletin/upload", { method: "POST", body: formData });
+			const res = await fetch("/api/admin/bulletin/upload", {
+				method: "POST",
+				headers: { Authorization: `Bearer ${token}` },
+				body: formData,
+			});
 			const json = await res.json();
 			if (!res.ok) {
 				setImageItems((prev) => prev.map((item) =>
@@ -118,8 +128,8 @@ export default function BulletinAdminPage() {
 		if (item.url) {
 			fetch("/api/admin/upload", {
 				method: "DELETE",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ password, url: item.url }),
+				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+				body: JSON.stringify({ url: item.url }),
 			});
 		}
 	};
@@ -136,8 +146,8 @@ export default function BulletinAdminPage() {
 		try {
 			const res = await fetch("/api/admin/bulletin", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ password, title, date: formatDate(date), image_urls }),
+				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+				body: JSON.stringify({ title, date: formatDate(date), image_urls }),
 			});
 			const json = await res.json();
 			if (!res.ok) {
@@ -160,8 +170,8 @@ export default function BulletinAdminPage() {
 		if (!confirm("이 주보를 삭제하시겠습니까?")) return;
 		const res = await fetch("/api/admin/bulletin", {
 			method: "DELETE",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ password, id }),
+			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ id }),
 		});
 		if (res.ok) {
 			setBulletins((prev) => prev.filter((b) => b.id !== id));
@@ -185,6 +195,12 @@ export default function BulletinAdminPage() {
 							<p className="text-stone-400 text-sm mt-2">주보 관리자 페이지입니다.</p>
 						</div>
 						<form onSubmit={handleAuth} className="space-y-4">
+							<div>
+								<label className="block text-sm font-medium text-stone-600 mb-2">이메일</label>
+								<input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+									className="w-full px-4 py-3 border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 text-[#333]"
+									placeholder="관리자 이메일을 입력하세요" required />
+							</div>
 							<div>
 								<label className="block text-sm font-medium text-stone-600 mb-2">비밀번호</label>
 								<input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
@@ -215,9 +231,17 @@ export default function BulletinAdminPage() {
 						<h1 className="text-3xl font-bold text-[#333]">주보 관리</h1>
 						<p className="text-stone-400 text-sm mt-1">주보 이미지를 업로드하거나 삭제할 수 있습니다.</p>
 					</div>
-					<TransitionLink href="/" className="flex items-center space-x-1 text-sm text-stone-500 hover:text-emerald-600 transition">
-						<ChevronLeft size={16} /><span>홈으로</span>
-					</TransitionLink>
+					<div className="flex items-center space-x-3">
+						<button
+							onClick={handleLogout}
+							className="text-sm text-stone-400 hover:text-red-500 transition"
+						>
+							로그아웃
+						</button>
+						<TransitionLink href="/" className="flex items-center space-x-1 text-sm text-stone-500 hover:text-emerald-600 transition">
+							<ChevronLeft size={16} /><span>홈으로</span>
+						</TransitionLink>
+					</div>
 				</div>
 
 				{/* Upload Form */}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { supabaseAdmin, verifyAdminToken } from "@/lib/supabase-server";
 
 const BUCKET = "bulletins";
 
@@ -10,11 +10,11 @@ function extractStoragePath(url: string): string | null {
 }
 
 export async function POST(request: NextRequest) {
-	const { password, title, date, image_urls } = await request.json();
-
-	if (password !== process.env.ADMIN_PASSWORD) {
-		return NextResponse.json({ error: "비밀번호가 올바르지 않습니다." }, { status: 401 });
+	if (!(await verifyAdminToken(request))) {
+		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
 	}
+
+	const { title, date, image_urls } = await request.json();
 
 	if (!title?.trim() || !date?.trim() || !image_urls?.length) {
 		return NextResponse.json({ error: "제목, 날짜, 이미지를 모두 입력해주세요." }, { status: 400 });
@@ -34,11 +34,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-	const { password, id } = await request.json();
-
-	if (password !== process.env.ADMIN_PASSWORD) {
-		return NextResponse.json({ error: "비밀번호가 올바르지 않습니다." }, { status: 401 });
+	if (!(await verifyAdminToken(request))) {
+		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
 	}
+
+	const { id } = await request.json();
 
 	const { data: bulletin } = await supabaseAdmin
 		.from("bulletins")
