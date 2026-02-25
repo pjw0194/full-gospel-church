@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { supabaseAdmin, verifyAdminToken } from "@/lib/supabase-server";
 
 const BUCKET = "bulletins";
 
 export async function POST(request: NextRequest) {
-	const formData = await request.formData();
-	const password = formData.get("password") as string;
-	const file = formData.get("file") as File | null;
-
-	if (password !== process.env.ADMIN_PASSWORD) {
-		return NextResponse.json({ error: "비밀번호가 올바르지 않습니다." }, { status: 401 });
+	if (!(await verifyAdminToken(request))) {
+		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
 	}
+
+	const formData = await request.formData();
+	const file = formData.get("file") as File | null;
 
 	if (!file) {
 		return NextResponse.json({ error: "파일이 없습니다." }, { status: 400 });
