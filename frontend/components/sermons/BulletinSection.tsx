@@ -1,58 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { ZoomIn, Download, Calendar, ChevronRight } from "lucide-react";
+import { ZoomIn, Calendar, ChevronRight, FileText } from "lucide-react";
 import BulletinModal from "@/components/common/BulletinModal";
-
-// Mock data for bulletins as per design request
-const bulletins = [
-	{
-		date: "2026.01.25",
-		title: "주일예배 주보",
-		images: ["/images/test-nature.jpg", "/images/test-nature.jpg"],
-	},
-	{
-		date: "2026.01.18",
-		title: "주일예배 주보",
-		images: ["/images/test-nature.jpg", "/images/test-nature.jpg"],
-	},
-	{
-		date: "2026.01.11",
-		title: "주일예배 주보",
-		images: ["/images/test-nature.jpg", "/images/test-nature.jpg"],
-	},
-	{
-		date: "2026.01.04",
-		title: "주일예배 주보",
-		images: ["/images/test-nature.jpg", "/images/test-nature.jpg"],
-	},
-	{
-		date: "2025.12.28",
-		title: "주일예배 주보",
-		images: ["/images/test-nature.jpg", "/images/test-nature.jpg"],
-	},
-	{
-		date: "2025.12.21",
-		title: "주일예배 주보",
-		images: ["/images/test-nature.jpg", "/images/test-nature.jpg"],
-	},
-];
+import { supabase, Bulletin } from "@/lib/supabase";
 
 export default function BulletinSection() {
+	const [bulletins, setBulletins] = useState<Bulletin[]>([]);
+	const [loading, setLoading] = useState(true);
 	const [isBulletinModalOpen, setIsBulletinModalOpen] = useState(false);
-	const [selectedDate, setSelectedDate] = useState<string | undefined>(
-		undefined,
-	);
+	const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 
-	const handleOpenModal = (date?: string) => {
-		setSelectedDate(date);
+	useEffect(() => {
+		supabase
+			.from("bulletins")
+			.select("*")
+			.order("created_at", { ascending: false })
+			.then(({ data }) => {
+				setBulletins(data ?? []);
+				setLoading(false);
+			});
+	}, []);
+
+	const handleOpenModal = (id?: string) => {
+		setSelectedId(id);
 		setIsBulletinModalOpen(true);
 	};
 
-	const closeBulletinModal = () => {
-		setIsBulletinModalOpen(false);
-	};
+	const latest = bulletins[0];
 
 	return (
 		<>
@@ -60,90 +36,119 @@ export default function BulletinSection() {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
 						<div>
-							<h2 className="text-3xl font-bold text-gray-900 mb-4">
-								주간 주보
-							</h2>
-							<p className="text-stone-500">
-								매주 발행되는 교회의 소식을 확인하세요.
-							</p>
+							<h2 className="text-3xl font-bold text-gray-900 mb-4">주간 주보</h2>
+							<p className="text-stone-500">매주 발행되는 교회의 소식을 확인하세요.</p>
 						</div>
-						<div className="flex items-center space-x-2 text-emerald-600 font-bold text-sm bg-white px-4 py-2 rounded-full shadow-sm">
-							<span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-							<span>LATEST: {bulletins[0].date}</span>
-						</div>
+						{latest && (
+							<div className="flex items-center space-x-2 text-emerald-600 font-bold text-sm bg-white px-4 py-2 rounded-full shadow-sm">
+								<span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+								<span>LATEST: {latest.date}</span>
+							</div>
+						)}
 					</div>
 
-					<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-						{/* Latest Bulletin Card */}
-						<div className="lg:col-span-7">
-							<div className="group relative bg-stone-900 rounded-[3rem] overflow-hidden shadow-xl aspect-16/10 flex items-center justify-center">
-								<div className="absolute inset-0 opacity-40 group-hover:opacity-30 transition-opacity">
-									<Image
-										src={bulletins[0].images[0]}
-										alt="Bulletin preview"
-										fill
-										className="object-cover"
-										sizes="(max-width: 1024px) 100vw, 60vw"
-									/>
-								</div>
-								<div className="relative z-10 text-center p-8">
-									<h3 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
-										{bulletins[0].date} 주보
-									</h3>
-									<div className="flex flex-wrap justify-center gap-4">
+					{/* Empty state */}
+					{!loading && bulletins.length === 0 && (
+						<div className="flex flex-col items-center justify-center py-32 text-stone-300 space-y-4">
+							<FileText size={56} />
+							<p className="text-lg font-medium">등록된 주보가 없습니다.</p>
+						</div>
+					)}
+
+					{/* Loading state */}
+					{loading && (
+						<div className="flex justify-center py-32">
+							<div className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-500 rounded-full animate-spin" />
+						</div>
+					)}
+
+					{!loading && bulletins.length > 0 && (
+						<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+							{/* Latest Bulletin Card */}
+							<div className="lg:col-span-7">
+								<div className="group relative bg-stone-900 rounded-[3rem] overflow-hidden shadow-xl aspect-[16/10] flex items-center justify-center">
+									{latest.image_urls?.[0] && (
+										<div className="absolute inset-0 opacity-40 group-hover:opacity-30 transition-opacity">
+											<Image
+												src={latest.image_urls[0]}
+												alt="주보 미리보기"
+												fill
+												className="object-cover"
+												sizes="(max-width: 1024px) 100vw, 60vw"
+											/>
+										</div>
+									)}
+									<div className="relative z-10 text-center p-8">
+										<p className="text-emerald-300 text-sm font-bold uppercase tracking-widest mb-3">
+											Latest Bulletin
+										</p>
+										<h3 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
+											{latest.date} {latest.title}
+										</h3>
 										<button
-											onClick={() => handleOpenModal(bulletins[0].date)}
-											className="bg-white text-stone-900 px-8 py-3 rounded-2xl font-bold flex items-center space-x-2 hover:bg-emerald-50 transition-colors"
+											onClick={() => handleOpenModal(latest.id)}
+											className="bg-white text-stone-900 px-8 py-3 rounded-2xl font-bold flex items-center space-x-2 hover:bg-emerald-50 transition-colors mx-auto"
 										>
 											<ZoomIn size={20} />
 											<span>크게 보기</span>
 										</button>
-										<button className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-3 rounded-2xl font-bold flex items-center space-x-2 hover:bg-white/20 transition-colors">
-											<Download size={20} />
-											<span>다운로드</span>
-										</button>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						{/* Previous Bulletins List */}
-						<div className="lg:col-span-5 bg-white rounded-[3rem] p-8 border border-stone-100 shadow-sm flex flex-col">
-							<h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center justify-between">
-								지난 주보 아카이브
-								<Calendar size={20} className="text-stone-300" />
-							</h4>
-							<div className="space-y-3 flex-1 overflow-y-auto pr-2 max-h-100">
-								{bulletins.slice(1).map((item, idx) => (
-									<button
-										key={idx}
-										onClick={() => handleOpenModal(item.date)}
-										className="w-full flex items-center justify-between p-4 bg-stone-50 rounded-2xl hover:bg-emerald-50/50 hover:border-emerald-100 border border-transparent transition-all group"
-									>
-										<div className="text-left">
-											<p className="text-xs text-stone-400 font-eng mb-0.5">
-												{item.date}
-											</p>
-											<p className="font-bold text-stone-700">{item.title}</p>
-										</div>
-										<ChevronRight
-											size={18}
-											className="text-stone-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all"
-										/>
-									</button>
-								))}
+							{/* Archive List */}
+							<div className="lg:col-span-5 bg-white rounded-[3rem] p-8 border border-stone-100 shadow-sm flex flex-col">
+								<h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center justify-between">
+									지난 주보 아카이브
+									<Calendar size={20} className="text-stone-300" />
+								</h4>
+
+								{bulletins.length === 1 ? (
+									<p className="text-stone-300 text-sm text-center py-8">지난 주보가 없습니다.</p>
+								) : (
+									<div className="space-y-3 flex-1 overflow-y-auto pr-2 max-h-96">
+										{bulletins.slice(1).map((item) => (
+											<button
+												key={item.id}
+												onClick={() => handleOpenModal(item.id)}
+												className="w-full flex items-center justify-between p-4 bg-stone-50 rounded-2xl hover:bg-emerald-50/50 hover:border-emerald-100 border border-transparent transition-all group"
+											>
+												<div className="flex items-center space-x-3 min-w-0">
+													{item.image_urls?.[0] && (
+														<div className="w-10 h-10 rounded-xl overflow-hidden border border-stone-200 flex-none">
+															<Image
+																src={item.image_urls[0]}
+																alt={item.title}
+																width={40}
+																height={40}
+																className="object-cover w-full h-full"
+															/>
+														</div>
+													)}
+													<div className="text-left min-w-0">
+														<p className="text-xs text-stone-400 mb-0.5">{item.date}</p>
+														<p className="font-bold text-stone-700 truncate">{item.title}</p>
+													</div>
+												</div>
+												<ChevronRight
+													size={18}
+													className="text-stone-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all flex-none ml-2"
+												/>
+											</button>
+										))}
+									</div>
+								)}
 							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</section>
 
-			{/* Bulletin Viewer Modal */}
 			<BulletinModal
 				isOpen={isBulletinModalOpen}
-				onClose={closeBulletinModal}
+				onClose={() => setIsBulletinModalOpen(false)}
 				bulletins={bulletins}
-				initialDate={selectedDate}
+				initialId={selectedId}
 			/>
 		</>
 	);
