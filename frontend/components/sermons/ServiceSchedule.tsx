@@ -30,10 +30,10 @@ export default function ServiceSchedule() {
 	];
 
 	return (
-		<section className="py-24 bg-white border-b border-stone-100">
+		<section className="py-16 sm:py-24 bg-white border-b border-stone-100">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="text-center mb-16">
-					<h2 className="text-3xl font-bold text-gray-900 mb-4">
+				<div className="text-center mb-10 sm:mb-16">
+					<h2 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-3 sm:mb-4">
 						예배 시간 안내
 					</h2>
 					<p className="text-stone-500">
@@ -41,22 +41,22 @@ export default function ServiceSchedule() {
 					</p>
 				</div>
 
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+				<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 					{serviceTimes.map((service, idx) => (
 						<div
 							key={idx}
-							className="bg-emerald-50/50 p-8 rounded-4xl border border-emerald-100/50 hover:bg-emerald-50 hover:shadow-md transition-all text-center group"
+							className="bg-emerald-50/50 p-6 sm:p-8 rounded-3xl border border-emerald-100/50 hover:bg-emerald-50 hover:shadow-md transition-all text-center group"
 						>
-							<div className="w-14 h-14 bg-white text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm">
+							<div className="w-12 h-12 sm:w-14 sm:h-14 bg-white text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm">
 								{service.icon}
 							</div>
-							<h3 className="text-lg font-bold text-gray-900 mb-2">
+							<h3 className="text-sm sm:text-lg font-bold text-stone-900 mb-1 sm:mb-2">
 								{service.name}
 							</h3>
-							<p className="text-xl font-bold text-emerald-700 mb-1 tracking-tight">
+							<p className="text-base sm:text-xl font-bold text-emerald-700 mb-1 tracking-tight">
 								{service.time}
 							</p>
-							<p className="text-sm text-stone-400">{service.location}</p>
+							<p className="text-xs sm:text-sm text-stone-400">{service.location}</p>
 						</div>
 					))}
 				</div>
