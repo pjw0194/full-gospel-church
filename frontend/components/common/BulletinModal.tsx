@@ -36,7 +36,11 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 
 	useEffect(() => {
 		document.body.style.overflow = isOpen ? "hidden" : "unset";
-		return () => { document.body.style.overflow = "unset"; };
+		document.body.classList.toggle("bulletin-modal-open", isOpen);
+		return () => {
+			document.body.style.overflow = "unset";
+			document.body.classList.remove("bulletin-modal-open");
+		};
 	}, [isOpen]);
 
 	const current = bulletins[selectedIdx];
@@ -56,6 +60,21 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 	const nextImage = useCallback(() => {
 		setLightboxIdx((i) => Math.min(images.length - 1, i + 1));
 	}, [images.length]);
+
+	const touchStartX = React.useRef<number | null>(null);
+
+	const handleTouchStart = (e: React.TouchEvent) => {
+		touchStartX.current = e.touches[0].clientX;
+	};
+
+	const handleTouchEnd = (e: React.TouchEvent) => {
+		if (touchStartX.current === null) return;
+		const diff = touchStartX.current - e.changedTouches[0].clientX;
+		if (Math.abs(diff) > 50) {
+			diff > 0 ? nextImage() : prevImage();
+		}
+		touchStartX.current = null;
+	};
 
 	useEffect(() => {
 		if (!lightboxOpen) return;
@@ -259,6 +278,8 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 							transition={{ duration: 0.15 }}
 							className="relative z-10 flex items-center justify-center"
 							onClick={(e) => e.stopPropagation()}
+							onTouchStart={handleTouchStart}
+							onTouchEnd={handleTouchEnd}
 						>
 							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img
