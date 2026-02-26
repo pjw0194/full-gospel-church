@@ -29,7 +29,7 @@ export default async function NewsPage() {
           NEWS
         </div>
         <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
-          <p className="text-emerald-600 uppercase tracking-widest text-sm mb-4">
+          <p className="text-emerald-600 uppercase tracking-widest text-sm mb-4 font-bold">
             Kansas Full Gospel Church
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-[#333] mb-6">
@@ -43,8 +43,8 @@ export default async function NewsPage() {
       </section>
 
       {/* News Grid */}
-      <section className="py-12 px-8 md:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">
+      <section className="py-12 md:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {posts.length === 0 && (
             <div className="text-center py-32">
               <Newspaper size={48} className="mx-auto text-stone-200 mb-6" />
@@ -58,12 +58,12 @@ export default async function NewsPage() {
           )}
 
           {posts.length > 0 && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
               {posts.map((post) => (
                 <Link href={`/news/${post.id}`} key={post.id}>
                   <article className="group bg-white border border-stone-100 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full">
                     {/* Image */}
-                    <div className="aspect-4/3 overflow-hidden bg-stone-100">
+                    <div className="aspect-[4/3] overflow-hidden bg-stone-100">
                       {post.image_urls?.[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -72,8 +72,8 @@ export default async function NewsPage() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray50 flex items-center justify-center">
-                          <Newspaper size={28} className="text-gray-300" />
+                        <div className="w-full h-full bg-stone-50 flex items-center justify-center">
+                          <Newspaper size={28} className="text-stone-300" />
                         </div>
                       )}
                     </div>
@@ -84,14 +84,13 @@ export default async function NewsPage() {
                         {post.title}
                       </h2>
                       <div className="flex items-center justify-between text-stone-400">
-                        <p className="text-xs sm:text-sm flex items-center space-x-1">
+                        <p className="text-xs flex items-center gap-1">
                           <Calendar size={11} />
                           <span>{formatDate(post.created_at)}</span>
                         </p>
-
                         {post.image_urls?.length > 1 && (
-                          <span className="flex gap-1 items-center text-xs sm:text-sm text-stone-300">
-                            <Images size={14} /> {post.image_urls.length}
+                          <span className="flex gap-1 items-center text-xs text-stone-300">
+                            <Images size={12} /> {post.image_urls.length}
                           </span>
                         )}
                       </div>

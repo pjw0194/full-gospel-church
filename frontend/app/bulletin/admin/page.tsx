@@ -71,7 +71,7 @@ export default function BulletinAdminPage() {
 		const { data } = await supabase
 			.from("bulletins")
 			.select("*")
-			.order("created_at", { ascending: false });
+			.order("date", { ascending: false });
 		setBulletins(data ?? []);
 		setBulletinsLoaded(true);
 	};

@@ -14,7 +14,7 @@ export default function QuickAccess() {
     supabase
       .from("bulletins")
       .select("*")
-      .order("created_at", { ascending: false })
+      .order("date", { ascending: false })
       .then(({ data }) => setBulletins(data ?? []));
   }, []);
   const handleScroll = (
@@ -64,23 +64,23 @@ export default function QuickAccess() {
 
   return (
     <>
-      <section className="container mx-auto px-5 sm:px-6 relative -mt-14 md:-mt-20 z-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 shadow-2xl rounded-2xl overflow-hidden bg-white border border-gray-100">
+      <section className="container mx-auto px-4 sm:px-6 relative -mt-10 sm:-mt-14 md:-mt-20 z-20">
+        <div className="grid grid-cols-3 shadow-2xl rounded-2xl overflow-hidden bg-white border border-stone-100">
           {infoItems.map((item, idx) => (
             <TransitionLink
               key={idx}
               href={item.link}
               onClick={(e) => handleScroll(e, item.link)}
-              className="flex flex-row md:flex-col items-center md:justify-center gap-4 md:gap-0 px-6 py-5 md:p-10 text-left md:text-center transition-all duration-300 hover:bg-stone-50 group border-b md:border-b-0 md:border-r last:border-0 border-stone-100 cursor-pointer"
+              className="flex flex-col items-center justify-center gap-2 px-3 py-5 sm:px-6 md:p-10 text-center transition-all duration-300 hover:bg-stone-50 group border-r last:border-0 border-stone-100 cursor-pointer"
             >
-              <div className="flex-none md:mb-4 transform group-hover:scale-110 transition-transform duration-300">
+              <div className="transform group-hover:scale-110 transition-transform duration-300 mb-1">
                 {item.icon}
               </div>
               <div>
-                <h3 className="text-base md:text-lg font-bold text-gray-800 md:mb-1">
+                <h3 className="text-xs sm:text-base font-bold text-stone-800 sm:mb-1">
                   {item.title}
                 </h3>
-                <p className="text-sm md:text-md text-stone-500">{item.description}</p>
+                <p className="hidden sm:block text-sm text-stone-500">{item.description}</p>
               </div>
             </TransitionLink>
           ))}
