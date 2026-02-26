@@ -21,3 +21,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 
 }
+
+header {
+  transition: opacity 0.2s ease;
+}
+
+body.bulletin-modal-open header {
+  opacity: 0;
+  pointer-events: none;
+}
