@@ -1,4 +1,4 @@
-import { Youtube, Instagram } from "lucide-react";
+import { Youtube, Instagram, Facebook } from "lucide-react";
 
 export default function Footer() {
 	return (
@@ -13,18 +13,31 @@ export default function Footer() {
 				</div>
 				<div className="flex space-x-4">
 					<a
-						href="#"
-						className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-110"
-						aria-label="Youtube"
-					>
-						<Youtube size={18} />
-					</a>
-					<a
-						href="#"
+						href="https://www.instagram.com/kansasfgchurch/"
+						target="_blank"
+						rel="noopener noreferrer"
 						className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-110"
 						aria-label="Instagram"
 					>
 						<Instagram size={18} />
+					</a>
+					<a
+						href="https://www.facebook.com/kansasfgc"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-110"
+						aria-label="Facebook"
+					>
+						<Facebook size={18} />
+					</a>
+					<a
+						href="https://www.youtube.com/@kansasfullgospelchurch"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-110"
+						aria-label="Youtube"
+					>
+						<Youtube size={18} />
 					</a>
 				</div>
 			</div>
