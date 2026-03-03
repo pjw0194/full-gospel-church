@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import TransitionLink from "@/components/common/TransitionLink";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Youtube, Instagram, Facebook } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
@@ -16,6 +16,24 @@ export default function Header() {
     { href: "/about", label: "교회소개" },
     { href: "/sermons", label: "예배/설교" },
     { href: "/news", label: "교회소식" },
+  ];
+
+  const socialLinks = [
+    {
+      href: "https://www.instagram.com/kansasfgchurch/",
+      label: "Instagram",
+      Icon: Instagram,
+    },
+    {
+      href: "https://www.facebook.com/kansasfgc",
+      label: "Facebook",
+      Icon: Facebook,
+    },
+    {
+      href: "https://www.youtube.com/@kansasfullgospelchurch",
+      label: "Youtube",
+      Icon: Youtube,
+    },
   ];
 
   return (
@@ -36,21 +54,37 @@ export default function Header() {
         </TransitionLink>
 
         {/* PC 내비게이션 */}
-        <nav className="hidden md:flex space-x-8 text-sm font-medium text-stone-600">
-          {navItems.map((item) => (
-            <TransitionLink
-              key={item.href}
-              href={item.href}
-              className={`transition-colors ${
-                isActive(item.href)
-                  ? "text-emerald-600 font-bold"
-                  : "hover:text-emerald-600"
-              }`}
-            >
-              {item.label}
-            </TransitionLink>
-          ))}
-        </nav>
+        <div className="hidden md:flex items-center gap-8">
+          <nav className="flex space-x-8 text-sm font-medium text-stone-600">
+            {navItems.map((item) => (
+              <TransitionLink
+                key={item.href}
+                href={item.href}
+                className={`transition-colors ${
+                  isActive(item.href)
+                    ? "text-emerald-600 font-bold"
+                    : "hover:text-emerald-600"
+                }`}
+              >
+                {item.label}
+              </TransitionLink>
+            ))}
+          </nav>
+          <div className="flex items-center gap-3 border-l border-stone-200 pl-8">
+            {socialLinks.map(({ href, label, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="text-stone-400 hover:text-emerald-600 transition-colors"
+              >
+                <Icon size={16} />
+              </a>
+            ))}
+          </div>
+        </div>
 
         {/* 모바일 메뉴 버튼 */}
         <button
@@ -84,6 +118,20 @@ export default function Header() {
             {item.label}
           </TransitionLink>
         ))}
+        <div className="flex items-center gap-5 pt-5 border-t border-stone-100 w-full justify-center">
+          {socialLinks.map(({ href, label, Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="text-stone-400 hover:text-emerald-600 transition-colors"
+            >
+              <Icon size={22} />
+            </a>
+          ))}
+        </div>
       </div>
     </header>
   );
