@@ -626,15 +626,15 @@ export default function AboutPage() {
                       </li>
                       <li className="flex items-start">
                         <span className="text-stone-400 mr-2">•</span>
-                        <span>여의도순복음교회 용산대교구 옵무목사 역임</span>
+                        <span>여의도순복음교회 용산대교구 총무목사 역임</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-stone-400 mr-2">•</span>
-                        <span>여의도순복음교회 오산리기도원 옵무목사 역임</span>
+                        <span>여의도순복음교회 오산리기도원 총무목사 역임</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-stone-400 mr-2">•</span>
-                        <span>여의도순복음교회 강남성전 옵무목사 역임</span>
+                        <span>여의도순복음교회 강남성전 총무목사 역임</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-stone-400 mr-2">•</span>
