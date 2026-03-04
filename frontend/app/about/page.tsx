@@ -11,8 +11,6 @@ import {
   Quote,
   Star,
   Award,
-  Calendar,
-  User,
   Users,
   UserCheck,
 } from "lucide-react";
@@ -72,16 +70,16 @@ export default function AboutPage() {
     },
     honoraryElders: [
       { name: "김남윤", role: "장로", image: "/images/members/김남윤장로.jpg" },
+      { name: "김창룡", role: "장로", image: "/images/members/김창룡장로.jpg" },
+      { name: "유귀곤", role: "장로", image: "/images/members/유귀곤장로.jpg" },
+      { name: "양호석", role: "장로", image: "/images/members/양호석장로.jpg" },
+      { name: "이돈화", role: "장로", image: "/images/members/이돈화장로.jpg" },
+      { name: "임명찬", role: "장로", image: "/images/members/임명찬장로.jpg" },
       {
         name: "Boyce Gunter",
         role: "장로",
         image: "/images/members/BoyceGunter.jpg",
       },
-      { name: "유귀곤", role: "장로", image: "/images/members/유귀곤장로.jpg" },
-      { name: "김창룡", role: "장로", image: "/images/members/김창룡장로.jpg" },
-      { name: "양호석", role: "장로", image: "/images/members/양호석장로.jpg" },
-      { name: "이돈화", role: "장로", image: "/images/members/이돈화장로.jpg" },
-      { name: "임명찬", role: "장로", image: "/images/members/임명찬장로.jpg" },
     ],
     retiredElder: {
       name: "이태훈",
