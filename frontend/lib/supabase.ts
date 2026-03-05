@@ -20,3 +20,21 @@ export type Bulletin = {
 	image_urls: string[];
 	created_at: string;
 };
+
+export type HistoryEra = {
+	id: string;
+	title: string;
+	period: string;
+	icon_name: string;
+	sort_order: number;
+};
+
+export type HistoryEvent = {
+	id: string;
+	era_id: string;
+	year: string;
+	date: string;
+	event_text: string;
+	is_major: boolean;
+	sort_order: number;
+};

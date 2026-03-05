@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   History,
@@ -13,7 +13,29 @@ import {
   Award,
   Users,
   UserCheck,
+  Loader2,
 } from "lucide-react";
+import { supabase, HistoryEra, HistoryEvent } from "@/lib/supabase";
+
+const iconMap: Record<string, React.ReactNode> = {
+  Star: <Star size={20} />,
+  ShieldCheck: <ShieldCheck size={20} />,
+  Users: <Users size={20} />,
+  History: <History size={20} />,
+};
+
+interface HistoryYearGroup {
+  year: string;
+  events: { id: string; date: string; text: string; isMajor: boolean }[];
+}
+
+interface HistoryEraDisplay {
+  id: string;
+  title: string;
+  period: string;
+  icon: React.ReactNode;
+  years: HistoryYearGroup[];
+}
 
 interface MemberProps {
   name: string;
@@ -56,6 +78,62 @@ const MemberCard: React.FC<MemberProps> = ({
 
 export default function AboutPage() {
   const [activeEra, setActiveEra] = useState(0);
+  const [historyEras, setHistoryEras] = useState<HistoryEraDisplay[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadHistory() {
+      const [{ data: eras }, { data: events }] = await Promise.all([
+        supabase
+          .from("church_history_eras")
+          .select("*")
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("church_history_events")
+          .select("*")
+          .order("sort_order", { ascending: true }),
+      ]);
+
+      if (!eras || !events) {
+        setHistoryLoading(false);
+        return;
+      }
+
+      const eraList = (eras as HistoryEra[]).map((era) => {
+        const eraEvents = (events as HistoryEvent[]).filter(
+          (e) => e.era_id === era.id
+        );
+        // Group by year, preserving order
+        const yearMap = new Map<string, HistoryYearGroup>();
+        for (const ev of eraEvents) {
+          if (!yearMap.has(ev.year)) {
+            yearMap.set(ev.year, { year: ev.year, events: [] });
+          }
+          yearMap.get(ev.year)!.events.push({
+            id: ev.id,
+            date: ev.date,
+            text: ev.event_text,
+            isMajor: ev.is_major,
+          });
+        }
+        // Sort years descending
+        const years = Array.from(yearMap.values()).sort((a, b) =>
+          b.year.localeCompare(a.year)
+        );
+        return {
+          id: era.id,
+          title: era.title,
+          period: era.period,
+          icon: iconMap[era.icon_name] ?? <Star size={20} />,
+          years,
+        };
+      });
+
+      setHistoryEras(eraList);
+      setHistoryLoading(false);
+    }
+    loadHistory();
+  }, []);
 
   const leaders = {
     pastor: {
@@ -134,362 +212,6 @@ export default function AboutPage() {
     { name: "유덕필 목사", period: "" },
     { name: "공영식 목사", period: "" },
     { name: "김경민 목사", period: "2015.07.27 - 2024.01.21" },
-  ];
-
-  const historyEras = [
-    {
-      title: "새로운 도약",
-      period: "2024 - 2026",
-      icon: <Star size={20} />,
-      years: [
-        {
-          year: "2026",
-          events: [
-            {
-              date: "01.05",
-              text: "신년축복 열두광주리 특별새벽기도회 (여의도순복음교회 연합)",
-              isMajor: true,
-            },
-            { date: "01.03", text: "신년축복 온가족 특별새벽기도회" },
-          ],
-        },
-        {
-          year: "2025",
-          events: [
-            { date: "12.31", text: "송구영신예배 및 윷놀이 대회" },
-            {
-              date: "12.25",
-              text: "2025 캔사스 성탄절 연합예배 참석 (구호성 목사 설교, 권세열 목사 봉헌기도)",
-            },
-            {
-              date: "12.21",
-              text: "2025년 캔사스순복음교회 남선교회, 여선교회 총회",
-            },
-            {
-              date: "12.13",
-              text: "William Curtis Cady 성도 천국환송예배",
-              isMajor: false,
-            },
-            {
-              date: "12.07",
-              text: "교회창립 48주년 제직임명감사예배 (명예장로 6명, 안수집사 1명, 권사 5명)",
-              isMajor: true,
-            },
-            { date: "12.06", text: "12월 온가족 특별새벽기도회" },
-            { date: "11.23", text: "2025 추수감사나눔공모전" },
-            {
-              date: "11.03",
-              text: "2025 추수감사 21일 특별새벽기도회(여의도순복음 연합)",
-              isMajor: true,
-            },
-            { date: "11.02", text: "조은영 전도사 사역종료" },
-            { date: "11.01", text: "11월 온가족 특별새벽기도회" },
-            { date: "10.31", text: "Holy Win Day 행사" },
-            {
-              date: "10.20",
-              text: "담임목사 북미총회 중중부지방회 모임 참석 (오마하)",
-            },
-            { date: "10.19", text: "장은경 전도사 해임" },
-            { date: "10.17", text: "특별 금요예배 (강사: 김문수 목사)" },
-            { date: "10.12", text: "제직임명 인준을 위한 공동의회" },
-            { date: "10.04", text: "10월 온가족 특별새벽기도회" },
-            { date: "09.28", text: "제직임명대상자 추천 및 지원 시작" },
-            { date: "09.14", text: "조한민 목사 해임" },
-            { date: "09.12", text: "특별 금요예배 (강사: 윤사무엘 전도사)" },
-            { date: "09.06", text: "9월 온가족 특별새벽기도회" },
-            {
-              date: "08.24",
-              text: "2025년도 캔사스순복음교회 침례식 (6명)",
-              isMajor: true,
-            },
-            { date: "08.22", text: "특별 금요예배 (강사: 최재은 선교사)" },
-            { date: "08.17", text: "조문수 권사님 90세 생신잔치" },
-            { date: "08.11", text: "친교실 주방 페인트 작업" },
-            { date: "08.04", text: "성전바닥 카페트 클리닝 작업" },
-            { date: "08.02", text: "8월 온가족 특별새벽기도회" },
-            {
-              date: "07.15",
-              text: "2025 교회학교 VBS (Keepers of the Kingdom)",
-              isMajor: true,
-            },
-            { date: "07.08", text: "VBS 및 다음세대를 위한 특별새벽기도회" },
-            { date: "07.05", text: "7월 온가족 특별새벽기도회" },
-            { date: "06.28", text: "브랜슨 DAVID 단체관람 (43명 참석)" },
-            { date: "06.07", text: "6월 온가족 특별새벽기도회" },
-            {
-              date: "05.26",
-              text: "제1회 캔사스 최고의 도시어부를 찾아라! (낚시공동체)",
-              isMajor: false,
-            },
-            { date: "05.18", text: "김메케나 성도 Baby Shower" },
-            { date: "05.17", text: "2025 여선교회 춘계 선교바자회" },
-            { date: "05.16", text: "특별 금요예배 (강사: 사라킴 대표)" },
-
-            { date: "05.03", text: "교회학교 봄소풍 및 5월 온가족 특새" },
-            { date: "04.25", text: "알러지 무료 침술 (안경환 원장)" },
-            {
-              date: "04.20",
-              text: "2025 캔사스 부활절 연합예배 및 본교회 예배",
-              isMajor: true,
-            },
-            { date: "04.13", text: "2025년도 1/4분기 제직회" },
-            { date: "04.11", text: "특별 금요예배 (강사: 연모세 선교사)" },
-            { date: "04.05", text: "4월 온가족 특별새벽기도회" },
-            { date: "03.26", text: "친교실 머그컵 거치대 설치 및 교육관 정비" },
-            {
-              date: "03.24",
-              text: "제50차 북미총회 정기총회 (LA, 담임목사 참석)",
-            },
-            { date: "03.16", text: "친교실 머그컵 사용 캠페인 시작" },
-            { date: "03.02", text: "2025 여선교회 정기 헌신예배" },
-            { date: "03.01", text: "2025 춘계대심방 시작", isMajor: true },
-            { date: "02.09", text: "2025 제직교육 시작" },
-            { date: "02.01", text: "캔사스 한인회 신년하례회 본교회 개최" },
-            { date: "01.26", text: "2024년 결산 및 2025년 예산 공동의회" },
-            { date: "01.17", text: "유튜브 온라인 실시간 방송 시작" },
-            { date: "01.02", text: "2025 신년축복 열두광주리 특별새벽기도회" },
-            { date: "01.01", text: "신년축복예배 및 통역기 구입(15EA)" },
-          ],
-        },
-        {
-          year: "2024",
-          events: [
-            {
-              date: "12.31",
-              text: "2025 송구영신예배 및 연말효도잔치",
-              isMajor: true,
-            },
-            {
-              date: "12.29",
-              text: "2025년도 교역자, 봉사부서 및 기관 담당 임명",
-            },
-            { date: "12.25", text: "2024 성탄축하예배" },
-            { date: "12.15", text: "남선교회 총회" },
-            { date: "12.01", text: "크리스마스 트리 설치" },
-            { date: "11.24", text: "2024 추수감사주일 행사" },
-            { date: "11.17", text: "여선교회 헌신예배 및 총회" },
-            { date: "11.10", text: "2024 Veteran's Day 감사행사" },
-            {
-              date: "11.03",
-              text: "추수감사 다니엘 특별새벽기도회",
-              isMajor: true,
-            },
-            { date: "10.05", text: "2024 가을맞이 바자회" },
-            {
-              date: "09.15",
-              text: "2024 가을맞이 온가족 초청 야외예배 (샤니미션파크)",
-              isMajor: true,
-            },
-            { date: "07.22", text: "교육관 수리 및 환경작업(페인트)" },
-            {
-              date: "07.14",
-              text: "2024 교회학교 하계 수련회 (캔터키 노아의 방주)",
-              isMajor: true,
-            },
-            { date: "06.30", text: "장은경 전도사 부임" },
-            { date: "05.05", text: "권세열 담임목사 공식 취임", isMajor: true },
-            {
-              date: "01.23",
-              text: "창립 47주년 및 권세열 목사 사역 시작",
-              isMajor: true,
-            },
-            {
-              date: "01.21",
-              text: "김경민 목사 사역종료 및 타코마(워싱턴주)로 임지 이동",
-            },
-            { date: "01.09", text: "권세열 목사 캔사스 도착" },
-          ],
-        },
-      ],
-    },
-    {
-      title: "성령의 역사",
-      period: "2015 - 2023",
-      icon: <ShieldCheck size={20} />,
-      years: [
-        {
-          year: "2023",
-          events: [
-            { date: "11.12", text: "조한민 목사 부임 (교회학교)" },
-            {
-              date: "04.14",
-              text: "두란노 아버지 학교 캔사스 2기 진행",
-              isMajor: true,
-            },
-            { date: "04.09", text: "침례식 및 헌아식 (총 6명)" },
-          ],
-        },
-        {
-          year: "2022",
-          events: [
-            { date: "12.04", text: "조은영 전도사 부임" },
-            { date: "10.16", text: "전교인 야외 예배 (Shawnee Mission Park)" },
-            { date: "05.01", text: "이형주 목사 부임" },
-            {
-              date: "04.22",
-              text: "창립 45주년 기념 부흥회 (윤호용 목사)",
-              isMajor: true,
-            },
-          ],
-        },
-        {
-          year: "2021",
-          events: [
-            { date: "10.31", text: "추수감사 21일 다니엘 기도회" },
-            { date: "06.20", text: "전교인 야외 예배" },
-            { date: "05.29", text: "성전 이전을 위한 바자회", isMajor: true },
-          ],
-        },
-        {
-          year: "2020",
-          events: [
-            {
-              date: "11.22",
-              text: "추수감사절 예배 및 집사 임명 (이병우, 이소피아)",
-              isMajor: true,
-            },
-            {
-              date: "07.13",
-              text: "성전 이전 및 영적 회복을 위한 40일 기도회",
-            },
-            {
-              date: "03.22",
-              text: "코로나19로 인한 온라인 예배 전환",
-              isMajor: true,
-            },
-          ],
-        },
-        {
-          year: "2019",
-          events: [
-            { date: "11.17", text: "새신자 침례 (이병우, 이소피아, 김예린)" },
-            { date: "08.31", text: "전교인 수련회 (Heartland Retreat Center)" },
-            { date: "02.17", text: "캔사스한글사랑한글학교 봄학기 개강" },
-            { date: "01.06", text: "한순황 전도사 부임" },
-          ],
-        },
-        {
-          year: "2018",
-          events: [
-            {
-              date: "09.28",
-              text: "캔사스 지역 연합 부흥회 (강사: 진유철 목사)",
-            },
-            { date: "07.23", text: "멕시코 단기 선교 파송", isMajor: true },
-            { date: "01.01", text: "2018 신년 특별 새벽 예배" },
-          ],
-        },
-        {
-          year: "2017",
-          events: [
-            {
-              date: "10.01",
-              text: "임직식 (명예장로 김남윤, 안수집사 김창룡 등)",
-              isMajor: true,
-            },
-            { date: "01.23", text: "교회 창립 40주년 기념" },
-          ],
-        },
-        {
-          year: "2015",
-          events: [
-            {
-              date: "07.26",
-              text: "제15대 김경민 담임목사 취임 및 공영식 목사 은퇴",
-              isMajor: true,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: "믿음의 계승",
-      period: "1995 - 2014",
-      icon: <Users size={20} />,
-      years: [
-        {
-          year: "2002",
-          events: [
-            { date: "01.20", text: "안수집사 류상선 임직", isMajor: true },
-          ],
-        },
-        {
-          year: "2001",
-          events: [
-            { date: "12.02", text: "여전도회와 권사회 분리 및 조직 정비" },
-          ],
-        },
-        {
-          year: "2000",
-          events: [
-            {
-              date: "02.20",
-              text: "캔사스순복음교회와 샘물순복음교회 통합 (박 엘리사 목사 취임)",
-              isMajor: true,
-            },
-            { date: "02.20", text: "조문수, 김금남, 최광자 권사 취임" },
-          ],
-        },
-        {
-          year: "1999",
-          events: [{ date: "03.07", text: "안수집사 이요한 임직" }],
-        },
-        {
-          year: "1996",
-          events: [{ date: "12.01", text: "박한득 권사 본 교회 시무 시작" }],
-        },
-        {
-          year: "1995",
-          events: [
-            {
-              date: "11.08",
-              text: "임직식 (안수집사 허생기, 권사 박진양, 최의기)",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: "창립과 개척",
-      period: "1977 - 1989",
-      icon: <History size={20} />,
-      years: [
-        {
-          year: "1989",
-          events: [
-            {
-              date: "10.29",
-              text: "현재 성전(1424 S 55th St) 매입 및 입당예배",
-              isMajor: true,
-            },
-            {
-              date: "10.01",
-              text: "건물 및 사택, 대지 3에이커 매입 ($120,000)",
-              isMajor: true,
-            },
-          ],
-        },
-        {
-          year: "1977",
-          events: [
-            {
-              date: "04.01",
-              text: "최자실 목사 인도하에 제직회 구성 (서일로 외 7명 임명)",
-              isMajor: true,
-            },
-            {
-              date: "01.23",
-              text: "박규봉 목사 외 5명으로 캔사스순복음교회 창립예배",
-              isMajor: true,
-            },
-            {
-              date: "개척사",
-              text: "성전 매입 전까지 12년 동안 8곳의 예배처소(Lexea 순복음, Leaven Worth 등)를 거치며 신앙의 터전을 다짐.",
-            },
-          ],
-        },
-      ],
-    },
   ];
 
   return (
@@ -828,81 +550,91 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="mb-16 flex flex-wrap justify-center gap-3">
-            {historyEras.map((era, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveEra(idx)}
-                className={`flex items-center space-x-2 rounded-2xl px-6 py-3 font-bold transition-all ${
-                  activeEra === idx
-                    ? "scale-105 bg-emerald-600 text-white shadow-lg"
-                    : "border border-stone-100 bg-white text-stone-400 hover:bg-stone-100"
-                }`}
-              >
-                {era.icon}
-                <span>{era.title}</span>
-                <span className="font-eng ml-1 text-[10px] opacity-60">
-                  ({era.period})
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="overflow-hidden rounded-[3rem] border border-stone-100 bg-white shadow-xl">
-              <div className="bg-emerald-600 p-8 text-white md:p-12">
-                <h3 className="mb-2 text-2xl font-bold md:text-3xl">
-                  {historyEras[activeEra].title}
-                </h3>
-                <p className="font-eng tracking-widest uppercase opacity-80">
-                  {historyEras[activeEra].period}
-                </p>
-              </div>
-
-              <div className="scrollbar-hide max-h-250 space-y-12 overflow-y-auto p-8 md:p-12">
-                {historyEras[activeEra].years.map((yearGroup, yIdx) => (
-                  <div
-                    key={yIdx}
-                    className="relative border-l border-stone-100 pb-4 pl-12 last:pb-0 md:pl-20"
+          {historyLoading ? (
+            <div className="flex items-center justify-center py-24 text-stone-300">
+              <Loader2 size={32} className="animate-spin" />
+            </div>
+          ) : (
+            <>
+              <div className="mb-16 flex flex-wrap justify-center gap-3">
+                {historyEras.map((era, idx) => (
+                  <button
+                    key={era.id}
+                    onClick={() => setActiveEra(idx)}
+                    className={`flex items-center space-x-2 rounded-2xl px-6 py-3 font-bold transition-all ${
+                      activeEra === idx
+                        ? "scale-105 bg-emerald-600 text-white shadow-lg"
+                        : "border border-stone-100 bg-white text-stone-400 hover:bg-stone-100"
+                    }`}
                   >
-                    <div className="absolute top-0 -left-1 h-2 w-2 rounded-full bg-emerald-500"></div>
-                    <div className="space-y-6">
-                      <h4 className="font-eng pointer-events-none absolute -top-3 -left-4 text-4xl font-bold tracking-tighter text-stone-100 opacity-70 md:-left-8">
-                        {yearGroup.year}
-                      </h4>
-
-                      <div className="grid gap-4">
-                        {yearGroup.events.map((event, eIdx) => (
-                          <div
-                            key={eIdx}
-                            className={`rounded-2xl p-4 transition-all ${event.isMajor ? "border border-emerald-100 bg-emerald-50" : "hover:bg-stone-50"}`}
-                          >
-                            <div className="flex flex-col md:flex-row md:items-baseline md:gap-4">
-                              <span
-                                className={`font-eng mb-1 inline-block rounded-md px-2 py-0.5 text-xs font-bold md:mb-0 ${event.isMajor ? "bg-emerald-600 text-white" : "bg-stone-100 text-stone-400"}`}
-                              >
-                                {event.date}
-                              </span>
-                              <div className="flex-1">
-                                <p
-                                  className={`text-base leading-relaxed ${event.isMajor ? "font-bold text-stone-800" : "text-stone-600"}`}
-                                >
-                                  {event.text}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                    {era.icon}
+                    <span>{era.title}</span>
+                    <span className="font-eng ml-1 text-[10px] opacity-60">
+                      ({era.period})
+                    </span>
+                  </button>
                 ))}
               </div>
-              <div className="flex justify-center border-t border-stone-100 bg-stone-50 p-6 text-sm text-stone-400 italic">
-                Scroll to see more history
-              </div>
-            </div>
-          </div>
+
+              {historyEras[activeEra] && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="overflow-hidden rounded-[3rem] border border-stone-100 bg-white shadow-xl">
+                    <div className="bg-emerald-600 p-8 text-white md:p-12">
+                      <h3 className="mb-2 text-2xl font-bold md:text-3xl">
+                        {historyEras[activeEra].title}
+                      </h3>
+                      <p className="font-eng tracking-widest uppercase opacity-80">
+                        {historyEras[activeEra].period}
+                      </p>
+                    </div>
+
+                    <div className="scrollbar-hide max-h-250 space-y-12 overflow-y-auto p-8 md:p-12">
+                      {historyEras[activeEra].years.map((yearGroup, yIdx) => (
+                        <div
+                          key={yIdx}
+                          className="relative border-l border-stone-100 pb-4 pl-12 last:pb-0 md:pl-20"
+                        >
+                          <div className="absolute top-0 -left-1 h-2 w-2 rounded-full bg-emerald-500"></div>
+                          <div className="space-y-6">
+                            <h4 className="font-eng pointer-events-none absolute -top-3 -left-4 text-4xl font-bold tracking-tighter text-stone-100 opacity-70 md:-left-8">
+                              {yearGroup.year}
+                            </h4>
+
+                            <div className="grid gap-4">
+                              {yearGroup.events.map((event) => (
+                                <div
+                                  key={event.id}
+                                  className={`rounded-2xl p-4 transition-all ${event.isMajor ? "border border-emerald-100 bg-emerald-50" : "hover:bg-stone-50"}`}
+                                >
+                                  <div className="flex flex-col md:flex-row md:items-baseline md:gap-4">
+                                    <span
+                                      className={`font-eng mb-1 inline-block rounded-md px-2 py-0.5 text-xs font-bold md:mb-0 ${event.isMajor ? "bg-emerald-600 text-white" : "bg-stone-100 text-stone-400"}`}
+                                    >
+                                      {event.date}
+                                    </span>
+                                    <div className="flex-1">
+                                      <p
+                                        className={`text-base leading-relaxed ${event.isMajor ? "font-bold text-stone-800" : "text-stone-600"}`}
+                                      >
+                                        {event.text}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-center border-t border-stone-100 bg-stone-50 p-6 text-sm text-stone-400 italic">
+                      Scroll to see more history
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
       {/* History & Identity Grid */}
