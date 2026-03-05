@@ -101,7 +101,7 @@ export default function AboutPage() {
 
       const eraList = (eras as HistoryEra[]).map((era) => {
         const eraEvents = (events as HistoryEvent[]).filter(
-          (e) => e.era_id === era.id
+          (e) => e.era_id === era.id,
         );
         // Group by year, preserving order
         const yearMap = new Map<string, HistoryYearGroup>();
@@ -118,7 +118,7 @@ export default function AboutPage() {
         }
         // Sort years descending
         const years = Array.from(yearMap.values()).sort((a, b) =>
-          b.year.localeCompare(a.year)
+          b.year.localeCompare(a.year),
         );
         return {
           id: era.id,
@@ -238,7 +238,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Greeting Section */}
-      <section className="bg-white px-12 py-16 sm:py-24">
+      <section className="bg-white py-16 sm:px-12 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Float layout: text wraps around image on all screen sizes */}
           <div className="overflow-hidden">
@@ -416,7 +416,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Serving Members Section */}
-      <section className="overflow-hidden border-t border-stone-100 bg-white px-12 py-16 sm:py-24">
+      <section className="overflow-hidden border-t border-stone-100 bg-white py-16 sm:px-12 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-20 text-center">
             <h2 className="mb-4 text-3xl font-bold text-[#333]">
@@ -503,7 +503,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Past Pastors Section */}
-      <section className="border-y border-stone-100 bg-stone-50 px-12 py-16 sm:py-24">
+      <section className="border-y border-stone-100 bg-stone-50 py-16 sm:px-12 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold text-[#333]">
@@ -541,7 +541,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Timeline Section */}{" "}
-      <section className="bg-stone-50/50 px-12 py-16 sm:py-24">
+      <section className="bg-stone-50/50 py-16 sm:px-12 sm:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold text-[#333]">교회 연혁</h2>
@@ -638,7 +638,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* History & Identity Grid */}
-      <section className="bg-[#F9F9F9] px-12 py-16 sm:py-24">
+      <section className="bg-[#F9F9F9] py-16 sm:px-12 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold text-[#333]">
@@ -695,7 +695,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Vision Point Section */}
-      <section className="bg-white px-12 py-16 sm:py-24">
+      <section className="bg-white py-16 sm:px-12 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[3rem] bg-stone-900 p-12 text-white md:p-20">
             <div className="absolute top-0 right-0 h-full w-1/2 opacity-10">
