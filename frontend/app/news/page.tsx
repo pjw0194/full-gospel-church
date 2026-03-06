@@ -1,6 +1,7 @@
 import { supabase, ChurchNews } from "@/lib/supabase";
 import { Calendar, Images, Newspaper, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import BulletinSection from "@/components/sermons/BulletinSection";
 
 export const revalidate = 60;
 
@@ -54,14 +55,22 @@ export default async function NewsPage({
           </h1>
           <div className="w-16 h-1 bg-emerald-500 mx-auto rounded-full mb-8" />
           <p className="max-w-xl mx-auto text-stone-500 text-lg leading-relaxed">
-            캔사스 순복음 교회의 최근 소식과 이야기를 전해드립니다.
+            캔사스 순복음 교회의 주보와 최근 소식을 전해드립니다.
           </p>
         </div>
       </section>
 
+      {/* Bulletin Section */}
+      <BulletinSection />
+
       {/* News Grid */}
       <section className="py-12 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-2">교회 소식</h2>
+            <p className="text-stone-500">캔사스 순복음 교회의 최근 소식과 이야기입니다.</p>
+          </div>
+
           {posts.length === 0 && (
             <div className="text-center py-32">
               <Newspaper size={48} className="mx-auto text-stone-200 mb-6" />
