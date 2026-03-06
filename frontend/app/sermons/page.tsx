@@ -2,7 +2,6 @@ import { getSermonList } from "@/lib/youtube";
 import Link from "next/link";
 import Image from "next/image";
 import ServiceSchedule from "@/components/sermons/ServiceSchedule";
-import BulletinSection from "@/components/sermons/BulletinSection";
 
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -44,8 +43,23 @@ export default async function SermonsPage({ searchParams }: Props) {
       {/* 1. Service Info Section */}
       <ServiceSchedule />
 
-      {/* 2. Bulletin Section */}
-      <BulletinSection />
+      {/* 2. Bulletin — moved to /news */}
+      <section className="py-10 bg-stone-50 px-3 sm:px-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-stone-100 rounded-2xl p-6 shadow-sm">
+            <div>
+              <h3 className="font-bold text-stone-800 text-lg mb-1">주간 주보</h3>
+              <p className="text-stone-500 text-sm">주보는 교회소식 페이지에서 확인하실 수 있습니다.</p>
+            </div>
+            <Link
+              href="/news#bulletin-section"
+              className="shrink-0 px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors text-sm"
+            >
+              주보 보러 가기
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* 3. Video Gallery Section */}
       <section

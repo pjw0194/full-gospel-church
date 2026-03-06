@@ -214,6 +214,9 @@ export default function AboutPage() {
     { name: "김경민 목사", period: "2015.07.27 - 2024.01.21" },
   ];
 
+  const currentYear = new Date().getFullYear();
+  const yearsOfHistory = currentYear - 1977;
+
   return (
     <main className="fade-in animate-in duration-700">
       {/* Page Header */}
@@ -301,7 +304,7 @@ export default function AboutPage() {
                   사랑의 공동체를 이루고 있습니다.
                 </p>
                 <p>
-                  49년이라는 짧지 않은 역사 속에서 전적인 하나님의 은혜로만
+                  {yearsOfHistory}년이라는 짧지 않은 역사 속에서 전적인 하나님의 은혜로만
                   캔사스순복음교회는 지속적인 성장을 이뤄왔고, 지난 2024년 1월,
                   여의도순복음교회에서 19년간 전문적인 훈련을 받은 권세열 목사가
                   이영훈 목사님의 파송을 받아 부임한 이후, 영적 도약과 새로운
@@ -648,13 +651,13 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-            {/* 48 Years History */}
+            {/* Years History */}
             <div className="group rounded-[2rem] border border-stone-100 bg-white p-10 shadow-sm transition-all hover:shadow-xl">
               <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 transition-colors group-hover:bg-emerald-500 group-hover:text-white">
                 <History className="h-8 w-8" />
               </div>
               <h3 className="mb-4 text-xl font-bold text-[#333]">
-                49년의 믿음의 역사
+                {yearsOfHistory}년의 믿음의 역사
               </h3>
               <p className="text-sm leading-relaxed text-stone-500">
                 1977년 1월 23일 창립된 캔사스 주에서 가장 오래된 한인교회입니다.
