@@ -654,7 +654,7 @@ export default function AboutPage() {
                 <History className="h-8 w-8" />
               </div>
               <h3 className="mb-4 text-xl font-bold text-[#333]">
-                48년의 믿음의 역사
+                49년의 믿음의 역사
               </h3>
               <p className="text-sm leading-relaxed text-stone-500">
                 1977년 1월 23일 창립된 캔사스 주에서 가장 오래된 한인교회입니다.
