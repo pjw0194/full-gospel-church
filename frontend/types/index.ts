@@ -91,4 +91,5 @@ export interface SermonListResponse {
 	sermons: SermonData[];
 	nextPageToken?: string;
 	prevPageToken?: string;
+	totalResults?: number;
 }
