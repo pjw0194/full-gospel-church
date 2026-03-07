@@ -1,21 +1,9 @@
-import { getSermonList } from "@/lib/youtube";
 import Link from "next/link";
 import Image from "next/image";
 import ServiceSchedule from "@/components/sermons/ServiceSchedule";
+import SermonVideoGallery from "@/components/sermons/SermonVideoGallery";
 
-interface Props {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-export default async function SermonsPage({ searchParams }: Props) {
-  const resolvedParams = await searchParams;
-  const pageToken =
-    typeof resolvedParams.pageToken === "string"
-      ? resolvedParams.pageToken
-      : undefined;
-
-  const { sermons, nextPageToken, prevPageToken } =
-    await getSermonList(pageToken);
+export default async function SermonsPage() {
 
   return (
     <main className="bg-white min-h-screen">
@@ -84,53 +72,7 @@ export default async function SermonsPage({ searchParams }: Props) {
               유튜브 채널 바로가기
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sermons.map((sermon) => (
-              <div
-                key={sermon.id}
-                className="bg-white rounded-2xl shadow-sm overflow-hidden border border-stone-100 hover:shadow-md transition-shadow"
-              >
-                <div className="aspect-video">
-                  <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${sermon.id}`}
-                    title={sermon.title}
-                    allowFullScreen
-                  />
-                </div>
-                <div className="p-5">
-                  <p className="text-emerald-600 text-sm font-medium mb-1.5">
-                    {sermon.date}
-                  </p>
-                  <h2 className="text-lg font-bold text-stone-900 mb-3 line-clamp-2">
-                    {sermon.title}
-                  </h2>
-                  <p className="text-stone-500 text-sm whitespace-pre-wrap line-clamp-3">
-                    {sermon.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center flex justify-center gap-4">
-            {prevPageToken && (
-              <Link
-                href={`/sermons?pageToken=${prevPageToken}#video-archive`}
-                className="px-8 py-3.5 border-2 border-stone-100 bg-white text-stone-600 font-bold rounded-2xl hover:bg-stone-50 transition-colors shadow-sm"
-              >
-                이전 영상
-              </Link>
-            )}
-            {nextPageToken && (
-              <Link
-                href={`/sermons?pageToken=${nextPageToken}#video-archive`}
-                className="px-8 py-3.5 border-2 border-transparent bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition-colors shadow-sm"
-              >
-                다음 영상
-              </Link>
-            )}
-          </div>
+          <SermonVideoGallery />
         </div>
       </section>
 
