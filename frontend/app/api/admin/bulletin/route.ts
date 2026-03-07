@@ -33,6 +33,47 @@ export async function POST(request: NextRequest) {
 	return NextResponse.json({ data }, { status: 201 });
 }
 
+export async function PUT(request: NextRequest) {
+	if (!(await verifyAdminToken(request))) {
+		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
+	}
+
+	const { id, title, date, image_urls } = await request.json();
+
+	if (!id || !title?.trim() || !date?.trim()) {
+		return NextResponse.json({ error: "제목과 날짜를 입력해주세요." }, { status: 400 });
+	}
+
+	// Clean up removed images from storage
+	const { data: existing } = await supabaseAdmin
+		.from("bulletins")
+		.select("image_urls")
+		.eq("id", id)
+		.single();
+
+	if (existing?.image_urls?.length) {
+		const newUrls = new Set(image_urls ?? []);
+		const removed = (existing.image_urls as string[])
+			.filter((u) => !newUrls.has(u))
+			.map(extractStoragePath)
+			.filter((p): p is string => p !== null);
+		if (removed.length) await supabaseAdmin.storage.from(BUCKET).remove(removed);
+	}
+
+	const { data, error } = await supabaseAdmin
+		.from("bulletins")
+		.update({ title: title.trim(), date: date.trim(), image_urls: image_urls ?? [] })
+		.eq("id", id)
+		.select()
+		.single();
+
+	if (error) {
+		return NextResponse.json({ error: "수정 중 오류가 발생했습니다." }, { status: 500 });
+	}
+
+	return NextResponse.json({ data });
+}
+
 export async function DELETE(request: NextRequest) {
 	if (!(await verifyAdminToken(request))) {
 		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });

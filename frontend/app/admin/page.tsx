@@ -17,10 +17,17 @@ type ImageItem = {
 	url: string;
 	uploading: boolean;
 	error: string;
+	isExisting?: boolean; // true = pre-existing image loaded for editing (don't delete on UI remove)
 };
+
+const ADMIN_LIMIT = 10;
 
 function formatBulletinDate(dateStr: string) {
 	return dateStr.replace(/-/g, ".");
+}
+
+function bulletinDateToInput(dateStr: string) {
+	return dateStr.replace(/\./g, "-");
 }
 
 function formatNewsDate(dateStr: string) {
@@ -39,15 +46,53 @@ function BulletinTab({ token }: { token: string }) {
 	const [submitLoading, setSubmitLoading] = useState(false);
 	const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
 	const [bulletins, setBulletins] = useState<Bulletin[]>([]);
 	const [bulletinsLoaded, setBulletinsLoaded] = useState(false);
+	const [hasMore, setHasMore] = useState(false);
+	const [loadingMore, setLoadingMore] = useState(false);
+	const [currentOffset, setCurrentOffset] = useState(0);
 
-	useEffect(() => { loadBulletins(); }, []);
+	const [editingId, setEditingId] = useState<string | null>(null);
 
-	const loadBulletins = async () => {
-		const { data } = await supabase.from("bulletins").select("*").order("date", { ascending: false });
-		setBulletins(data ?? []);
-		setBulletinsLoaded(true);
+	useEffect(() => { loadBulletins(true); }, []);
+
+	const loadBulletins = async (reset: boolean) => {
+		const newOffset = reset ? 0 : currentOffset + ADMIN_LIMIT;
+		if (reset) setBulletinsLoaded(false);
+		else setLoadingMore(true);
+
+		const { data } = await supabase
+			.from("bulletins")
+			.select("*")
+			.order("date", { ascending: false })
+			.range(newOffset, newOffset + ADMIN_LIMIT - 1);
+
+		const fetched = data ?? [];
+		if (reset) {
+			setBulletins(fetched);
+			setCurrentOffset(0);
+			setBulletinsLoaded(true);
+		} else {
+			setBulletins((prev) => [...prev, ...fetched]);
+			setCurrentOffset(newOffset);
+			setLoadingMore(false);
+		}
+		setHasMore(fetched.length === ADMIN_LIMIT);
+	};
+
+	const handleStartEdit = (b: Bulletin) => {
+		setEditingId(b.id);
+		setTitle(b.title);
+		setDate(bulletinDateToInput(b.date));
+		setImageItems(b.image_urls.map((url) => ({ key: url, preview: url, url, uploading: false, error: "", isExisting: true })));
+		setSubmitMessage(null);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
+
+	const handleCancelEdit = () => {
+		setEditingId(null);
+		setTitle(""); setDate(""); setImageItems([]); setSubmitMessage(null);
 	};
 
 	const uploadFile = async (file: File) => {
@@ -92,7 +137,8 @@ function BulletinTab({ token }: { token: string }) {
 		const item = imageItems.find((i) => i.key === key);
 		if (!item) return;
 		setImageItems((prev) => prev.filter((i) => i.key !== key));
-		if (item.url) {
+		// Only delete from storage immediately for newly uploaded files (pre-existing images are cleaned up server-side on PUT)
+		if (item.url && !item.isExisting) {
 			fetch("/api/admin/upload", {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -109,17 +155,18 @@ function BulletinTab({ token }: { token: string }) {
 		setSubmitMessage(null);
 		try {
 			const res = await fetch("/api/admin/bulletin", {
-				method: "POST",
+				method: editingId ? "PUT" : "POST",
 				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-				body: JSON.stringify({ title, date: formatBulletinDate(date), image_urls }),
+				body: JSON.stringify({ ...(editingId && { id: editingId }), title, date: formatBulletinDate(date), image_urls }),
 			});
 			const json = await res.json();
 			if (!res.ok) {
 				setSubmitMessage({ type: "error", text: json.error ?? "오류가 발생했습니다." });
 			} else {
-				setSubmitMessage({ type: "success", text: "주보가 등록되었습니다!" });
+				setSubmitMessage({ type: "success", text: editingId ? "주보가 수정되었습니다!" : "주보가 등록되었습니다!" });
 				setTitle(""); setDate(""); setImageItems([]);
-				loadBulletins();
+				setEditingId(null);
+				loadBulletins(true);
 			}
 		} catch {
 			setSubmitMessage({ type: "error", text: "서버 연결에 실패했습니다." });
@@ -135,8 +182,12 @@ function BulletinTab({ token }: { token: string }) {
 			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
 			body: JSON.stringify({ id }),
 		});
-		if (res.ok) setBulletins((prev) => prev.filter((b) => b.id !== id));
-		else alert("삭제 중 오류가 발생했습니다.");
+		if (res.ok) {
+			setBulletins((prev) => prev.filter((b) => b.id !== id));
+			if (editingId === id) handleCancelEdit();
+		} else {
+			alert("삭제 중 오류가 발생했습니다.");
+		}
 	};
 
 	const isAnyUploading = imageItems.some((i) => i.uploading);
@@ -144,10 +195,19 @@ function BulletinTab({ token }: { token: string }) {
 	return (
 		<div className="space-y-8">
 			<div className="bg-white rounded-3xl shadow-sm border border-stone-100 p-8">
-				<h2 className="text-lg font-bold text-[#333] mb-6 flex items-center space-x-2">
-					<PlusCircle size={20} className="text-emerald-600" />
-					<span>새 주보 등록</span>
-				</h2>
+				<div className="flex items-center justify-between mb-6">
+					<h2 className="text-lg font-bold text-[#333] flex items-center space-x-2">
+						{editingId
+							? <Edit3 size={20} className="text-emerald-600" />
+							: <PlusCircle size={20} className="text-emerald-600" />}
+						<span>{editingId ? "주보 수정" : "새 주보 등록"}</span>
+					</h2>
+					{editingId && (
+						<button type="button" onClick={handleCancelEdit} className="text-sm text-stone-400 hover:text-stone-600 transition">
+							취소
+						</button>
+					)}
+				</div>
 				<form onSubmit={handleSubmit} className="space-y-5">
 					<div>
 						<label className="block text-sm font-medium text-stone-600 mb-2">제목 *</label>
@@ -197,7 +257,7 @@ function BulletinTab({ token }: { token: string }) {
 					)}
 					<button type="submit" disabled={submitLoading || isAnyUploading}
 						className="w-full bg-emerald-600 text-white py-3 rounded-2xl font-bold hover:bg-emerald-700 transition disabled:opacity-50">
-						{isAnyUploading ? "이미지 업로드 중..." : submitLoading ? "등록 중..." : "주보 등록하기"}
+						{isAnyUploading ? "이미지 업로드 중..." : submitLoading ? (editingId ? "수정 중..." : "등록 중...") : (editingId ? "주보 저장하기" : "주보 등록하기")}
 					</button>
 				</form>
 			</div>
@@ -208,12 +268,12 @@ function BulletinTab({ token }: { token: string }) {
 				{bulletinsLoaded && bulletins.length === 0 && <p className="text-stone-300 text-sm text-center py-8">등록된 주보가 없습니다.</p>}
 				<div className="space-y-3">
 					{bulletins.map((b) => (
-						<div key={b.id} className="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
+						<div key={b.id} className={`flex items-center justify-between p-4 rounded-2xl border transition ${editingId === b.id ? "border-emerald-200 bg-emerald-50" : "bg-stone-50 border-stone-100"}`}>
 							<div className="flex items-center space-x-3 min-w-0">
 								{b.image_urls?.[0] && (
 									<div className="w-12 h-12 rounded-xl overflow-hidden border border-stone-200 flex-none">
 										{/* eslint-disable-next-line @next/next/no-img-element */}
-										<img src={b.image_urls[0]} alt="" className="w-full h-full object-cover" />
+										<img src={b.image_urls[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
 									</div>
 								)}
 								<div className="min-w-0">
@@ -222,10 +282,33 @@ function BulletinTab({ token }: { token: string }) {
 									{b.image_urls?.length > 1 && <p className="text-emerald-500 text-xs mt-0.5">{b.image_urls.length}페이지</p>}
 								</div>
 							</div>
-							<button onClick={() => handleDelete(b.id)} className="text-stone-300 hover:text-red-500 transition p-1 ml-4 flex-none"><Trash2 size={16} /></button>
+							<div className="flex items-center space-x-1 flex-none ml-4">
+								<button
+									onClick={() => handleStartEdit(b)}
+									className={`p-1.5 transition ${editingId === b.id ? "text-emerald-500" : "text-stone-300 hover:text-emerald-500"}`}
+									title="수정"
+								>
+									<Edit3 size={15} />
+								</button>
+								<button onClick={() => handleDelete(b.id)} className="p-1.5 text-stone-300 hover:text-red-500 transition" title="삭제">
+									<Trash2 size={15} />
+								</button>
+							</div>
 						</div>
 					))}
 				</div>
+				{hasMore && (
+					<div className="mt-4 text-center">
+						<button
+							onClick={() => loadBulletins(false)}
+							disabled={loadingMore}
+							className="px-6 py-2.5 border border-stone-200 text-stone-500 rounded-2xl text-sm font-bold hover:bg-stone-50 transition disabled:opacity-50 flex items-center space-x-2 mx-auto"
+						>
+							{loadingMore ? <Loader2 size={14} className="animate-spin" /> : null}
+							<span>{loadingMore ? "불러오는 중..." : "더보기"}</span>
+						</button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -242,15 +325,53 @@ function NewsTab({ token }: { token: string }) {
 	const [submitLoading, setSubmitLoading] = useState(false);
 	const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
 	const [posts, setPosts] = useState<ChurchNews[]>([]);
 	const [postsLoaded, setPostsLoaded] = useState(false);
+	const [hasMore, setHasMore] = useState(false);
+	const [loadingMore, setLoadingMore] = useState(false);
+	const [currentOffset, setCurrentOffset] = useState(0);
 
-	useEffect(() => { loadPosts(); }, []);
+	const [editingId, setEditingId] = useState<string | null>(null);
 
-	const loadPosts = async () => {
-		const { data } = await supabase.from("church_news").select("*").order("created_at", { ascending: false });
-		setPosts(data ?? []);
-		setPostsLoaded(true);
+	useEffect(() => { loadPosts(true); }, []);
+
+	const loadPosts = async (reset: boolean) => {
+		const newOffset = reset ? 0 : currentOffset + ADMIN_LIMIT;
+		if (reset) setPostsLoaded(false);
+		else setLoadingMore(true);
+
+		const { data } = await supabase
+			.from("church_news")
+			.select("*")
+			.order("created_at", { ascending: false })
+			.range(newOffset, newOffset + ADMIN_LIMIT - 1);
+
+		const fetched = data ?? [];
+		if (reset) {
+			setPosts(fetched);
+			setCurrentOffset(0);
+			setPostsLoaded(true);
+		} else {
+			setPosts((prev) => [...prev, ...fetched]);
+			setCurrentOffset(newOffset);
+			setLoadingMore(false);
+		}
+		setHasMore(fetched.length === ADMIN_LIMIT);
+	};
+
+	const handleStartEdit = (post: ChurchNews) => {
+		setEditingId(post.id);
+		setTitle(post.title);
+		setContent(post.content);
+		setImageItems((post.image_urls ?? []).map((url) => ({ key: url, preview: url, url, uploading: false, error: "", isExisting: true })));
+		setSubmitMessage(null);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
+
+	const handleCancelEdit = () => {
+		setEditingId(null);
+		setTitle(""); setContent(""); setImageItems([]); setSubmitMessage(null);
 	};
 
 	const uploadFile = async (file: File) => {
@@ -295,7 +416,7 @@ function NewsTab({ token }: { token: string }) {
 		const item = imageItems.find((i) => i.key === key);
 		if (!item) return;
 		setImageItems((prev) => prev.filter((i) => i.key !== key));
-		if (item.url) {
+		if (item.url && !item.isExisting) {
 			fetch("/api/admin/upload", {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -311,17 +432,18 @@ function NewsTab({ token }: { token: string }) {
 		const image_urls = imageItems.filter((i) => i.url).map((i) => i.url);
 		try {
 			const res = await fetch("/api/admin/news", {
-				method: "POST",
+				method: editingId ? "PUT" : "POST",
 				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-				body: JSON.stringify({ title, content, image_urls }),
+				body: JSON.stringify({ ...(editingId && { id: editingId }), title, content, image_urls }),
 			});
 			const json = await res.json();
 			if (!res.ok) {
 				setSubmitMessage({ type: "error", text: json.error ?? "오류가 발생했습니다." });
 			} else {
-				setSubmitMessage({ type: "success", text: "게시물이 등록되었습니다!" });
+				setSubmitMessage({ type: "success", text: editingId ? "게시물이 수정되었습니다!" : "게시물이 등록되었습니다!" });
 				setTitle(""); setContent(""); setImageItems([]);
-				loadPosts();
+				setEditingId(null);
+				loadPosts(true);
 			}
 		} catch {
 			setSubmitMessage({ type: "error", text: "서버 연결에 실패했습니다." });
@@ -337,8 +459,12 @@ function NewsTab({ token }: { token: string }) {
 			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
 			body: JSON.stringify({ id }),
 		});
-		if (res.ok) setPosts((prev) => prev.filter((p) => p.id !== id));
-		else alert("삭제 중 오류가 발생했습니다.");
+		if (res.ok) {
+			setPosts((prev) => prev.filter((p) => p.id !== id));
+			if (editingId === id) handleCancelEdit();
+		} else {
+			alert("삭제 중 오류가 발생했습니다.");
+		}
 	};
 
 	const isAnyUploading = imageItems.some((i) => i.uploading);
@@ -346,10 +472,19 @@ function NewsTab({ token }: { token: string }) {
 	return (
 		<div className="space-y-8">
 			<div className="bg-white rounded-3xl shadow-sm border border-stone-100 p-8">
-				<h2 className="text-lg font-bold text-[#333] mb-6 flex items-center space-x-2">
-					<PlusCircle size={20} className="text-emerald-600" />
-					<span>새 소식 작성</span>
-				</h2>
+				<div className="flex items-center justify-between mb-6">
+					<h2 className="text-lg font-bold text-[#333] flex items-center space-x-2">
+						{editingId
+							? <Edit3 size={20} className="text-emerald-600" />
+							: <PlusCircle size={20} className="text-emerald-600" />}
+						<span>{editingId ? "소식 수정" : "새 소식 작성"}</span>
+					</h2>
+					{editingId && (
+						<button type="button" onClick={handleCancelEdit} className="text-sm text-stone-400 hover:text-stone-600 transition">
+							취소
+						</button>
+					)}
+				</div>
 				<form onSubmit={handleSubmit} className="space-y-5">
 					<div>
 						<label className="block text-sm font-medium text-stone-600 mb-2">제목 *</label>
@@ -399,7 +534,7 @@ function NewsTab({ token }: { token: string }) {
 					)}
 					<button type="submit" disabled={submitLoading || isAnyUploading}
 						className="w-full bg-emerald-600 text-white py-3 rounded-2xl font-bold hover:bg-emerald-700 transition disabled:opacity-50">
-						{isAnyUploading ? "이미지 업로드 중..." : submitLoading ? "게시 중..." : "소식 게시하기"}
+						{isAnyUploading ? "이미지 업로드 중..." : submitLoading ? (editingId ? "수정 중..." : "게시 중...") : (editingId ? "소식 저장하기" : "소식 게시하기")}
 					</button>
 				</form>
 			</div>
@@ -410,12 +545,12 @@ function NewsTab({ token }: { token: string }) {
 				{postsLoaded && posts.length === 0 && <p className="text-stone-300 text-sm text-center py-8">등록된 게시물이 없습니다.</p>}
 				<div className="space-y-4">
 					{posts.map((post) => (
-						<div key={post.id} className="flex items-start justify-between p-5 bg-stone-50 rounded-2xl border border-stone-100">
+						<div key={post.id} className={`flex items-start justify-between p-5 rounded-2xl border transition ${editingId === post.id ? "border-emerald-200 bg-emerald-50" : "bg-stone-50 border-stone-100"}`}>
 							<div className="flex items-start space-x-4 flex-1 min-w-0 mr-4">
 								{post.image_urls?.[0] && (
 									<div className="flex-none w-14 h-14 rounded-xl overflow-hidden border border-stone-200">
 										{/* eslint-disable-next-line @next/next/no-img-element */}
-										<img src={post.image_urls[0]} alt="" className="w-full h-full object-cover" />
+										<img src={post.image_urls[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
 									</div>
 								)}
 								<div className="min-w-0">
@@ -424,10 +559,33 @@ function NewsTab({ token }: { token: string }) {
 									{post.image_urls?.length > 1 && <p className="text-emerald-500 text-xs mt-1">이미지 {post.image_urls.length}장</p>}
 								</div>
 							</div>
-							<button onClick={() => handleDelete(post.id)} className="flex-none text-stone-300 hover:text-red-500 transition p-1"><Trash2 size={18} /></button>
+							<div className="flex items-center space-x-1 flex-none">
+								<button
+									onClick={() => handleStartEdit(post)}
+									className={`p-1.5 transition ${editingId === post.id ? "text-emerald-500" : "text-stone-300 hover:text-emerald-500"}`}
+									title="수정"
+								>
+									<Edit3 size={16} />
+								</button>
+								<button onClick={() => handleDelete(post.id)} className="p-1.5 text-stone-300 hover:text-red-500 transition" title="삭제">
+									<Trash2 size={16} />
+								</button>
+							</div>
 						</div>
 					))}
 				</div>
+				{hasMore && (
+					<div className="mt-4 text-center">
+						<button
+							onClick={() => loadPosts(false)}
+							disabled={loadingMore}
+							className="px-6 py-2.5 border border-stone-200 text-stone-500 rounded-2xl text-sm font-bold hover:bg-stone-50 transition disabled:opacity-50 flex items-center space-x-2 mx-auto"
+						>
+							{loadingMore ? <Loader2 size={14} className="animate-spin" /> : null}
+							<span>{loadingMore ? "불러오는 중..." : "더보기"}</span>
+						</button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -454,7 +612,7 @@ function HistoryTab({ token }: { token: string }) {
 	const [events, setEvents] = useState<HistoryEvent[]>([]);
 	const [loaded, setLoaded] = useState(false);
 
-	// Event form
+	// Event add form
 	const [selectedEraId, setSelectedEraId] = useState("");
 	const [year, setYear] = useState("");
 	const [date, setDate] = useState("");
@@ -463,6 +621,15 @@ function HistoryTab({ token }: { token: string }) {
 	const [eventSubmitLoading, setEventSubmitLoading] = useState(false);
 	const [eventMessage, setEventMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 	const [filterEraId, setFilterEraId] = useState("all");
+
+	// Event inline edit
+	const [editingEventId, setEditingEventId] = useState<string | null>(null);
+	const [editEventYear, setEditEventYear] = useState("");
+	const [editEventDate, setEditEventDate] = useState("");
+	const [editEventText, setEditEventText] = useState("");
+	const [editEventIsMajor, setEditEventIsMajor] = useState(false);
+	const [editEventLoading, setEditEventLoading] = useState(false);
+	const [editEventMessage, setEditEventMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
 	// Era management panel
 	const [erasPanelOpen, setErasPanelOpen] = useState(false);
@@ -522,8 +689,50 @@ function HistoryTab({ token }: { token: string }) {
 			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
 			body: JSON.stringify({ id }),
 		});
-		if (res.ok) setEvents((prev) => prev.filter((ev) => ev.id !== id));
-		else alert("삭제 중 오류가 발생했습니다.");
+		if (res.ok) {
+			setEvents((prev) => prev.filter((ev) => ev.id !== id));
+			if (editingEventId === id) setEditingEventId(null);
+		} else {
+			alert("삭제 중 오류가 발생했습니다.");
+		}
+	};
+
+	const handleStartEventEdit = (ev: HistoryEvent) => {
+		setEditingEventId(ev.id);
+		setEditEventYear(ev.year);
+		setEditEventDate(ev.date);
+		setEditEventText(ev.event_text);
+		setEditEventIsMajor(ev.is_major);
+		setEditEventMessage(null);
+	};
+
+	const handleCancelEventEdit = () => {
+		setEditingEventId(null);
+		setEditEventYear(""); setEditEventDate(""); setEditEventText(""); setEditEventIsMajor(false);
+		setEditEventMessage(null);
+	};
+
+	const handleEventEdit = async (id: string) => {
+		setEditEventLoading(true);
+		setEditEventMessage(null);
+		try {
+			const res = await fetch("/api/admin/history", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+				body: JSON.stringify({ id, year: editEventYear, date: editEventDate, event_text: editEventText, is_major: editEventIsMajor }),
+			});
+			const json = await res.json();
+			if (!res.ok) {
+				setEditEventMessage({ type: "error", text: json.error ?? "오류가 발생했습니다." });
+			} else {
+				setEvents((prev) => prev.map((ev) => ev.id === id ? json.data : ev));
+				handleCancelEventEdit();
+			}
+		} catch {
+			setEditEventMessage({ type: "error", text: "서버 연결에 실패했습니다." });
+		} finally {
+			setEditEventLoading(false);
+		}
 	};
 
 	// ---- Era handlers ----
@@ -607,7 +816,11 @@ function HistoryTab({ token }: { token: string }) {
 		}
 		const years = Array.from(yearMap.entries())
 			.sort((a, b) => b[0].localeCompare(a[0]))
-			.map(([y, evs]) => ({ year: y, events: evs }));
+			.map(([y, evs]) => ({
+				year: y,
+				// Sort events within each year by date descending (matches about/page.tsx)
+				events: [...evs].sort((a, b) => b.date.localeCompare(a.date)),
+			}));
 		return { era, years };
 	}).filter((g) => g.years.length > 0 || filterEraId === "all");
 
@@ -630,7 +843,6 @@ function HistoryTab({ token }: { token: string }) {
 
 				{erasPanelOpen && (
 					<div className="border-t border-stone-100 p-8 space-y-6">
-						{/* Era list */}
 						<div className="space-y-2">
 							{!loaded && <p className="text-stone-400 text-sm text-center py-4">불러오는 중...</p>}
 							{loaded && eras.length === 0 && <p className="text-stone-300 text-sm text-center py-4">등록된 시대가 없습니다.</p>}
@@ -667,7 +879,6 @@ function HistoryTab({ token }: { token: string }) {
 							))}
 						</div>
 
-						{/* Add / Edit form */}
 						<div className="border-t border-stone-100 pt-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-sm font-bold text-stone-700">
@@ -817,16 +1028,107 @@ function HistoryTab({ token }: { token: string }) {
 										<p className="text-sm font-bold text-stone-400 mb-2">{y}년</p>
 										<div className="space-y-2">
 											{yEvents.map((ev) => (
-												<div key={ev.id} className={`flex items-start justify-between p-3 rounded-2xl border ${ev.is_major ? "border-emerald-100 bg-emerald-50" : "border-stone-100 bg-stone-50"}`}>
-													<div className="flex items-start space-x-3 flex-1 min-w-0 mr-3">
-														<span className={`flex-none mt-0.5 inline-block rounded-md px-2 py-0.5 text-xs font-bold ${ev.is_major ? "bg-emerald-600 text-white" : "bg-stone-200 text-stone-500"}`}>
-															{ev.date}
-														</span>
-														<p className={`text-sm leading-relaxed ${ev.is_major ? "font-bold text-stone-800" : "text-stone-600"}`}>{ev.event_text}</p>
-													</div>
-													<button onClick={() => handleEventDelete(ev.id)} className="flex-none text-stone-300 hover:text-red-500 transition p-1 mt-0.5">
-														<Trash2 size={14} />
-													</button>
+												<div key={ev.id} className={`rounded-2xl border transition ${ev.is_major ? "border-emerald-100 bg-emerald-50" : "border-stone-100 bg-stone-50"} ${editingEventId === ev.id ? "ring-2 ring-emerald-300" : ""}`}>
+													{editingEventId === ev.id ? (
+														// Inline edit form
+														<div className="p-4 space-y-3">
+															<div className="grid grid-cols-2 gap-2">
+																<div>
+																	<label className="block text-xs font-medium text-stone-500 mb-1">연도</label>
+																	<input
+																		type="text"
+																		value={editEventYear}
+																		onChange={(e) => setEditEventYear(e.target.value)}
+																		className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-[#333]"
+																		placeholder="예: 2025"
+																	/>
+																</div>
+																<div>
+																	<label className="block text-xs font-medium text-stone-500 mb-1">날짜</label>
+																	<input
+																		type="text"
+																		value={editEventDate}
+																		onChange={(e) => setEditEventDate(e.target.value)}
+																		className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-[#333]"
+																		placeholder="예: 03.01"
+																	/>
+																</div>
+															</div>
+															<textarea
+																value={editEventText}
+																onChange={(e) => setEditEventText(e.target.value)}
+																rows={2}
+																className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-[#333] resize-none"
+																placeholder="연혁 내용"
+															/>
+															<label className="flex items-center space-x-2 cursor-pointer">
+																<div
+																	className={`relative w-10 h-5 rounded-full transition-colors ${editEventIsMajor ? "bg-emerald-500" : "bg-stone-200"}`}
+																	onClick={() => setEditEventIsMajor((v) => !v)}
+																>
+																	<div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${editEventIsMajor ? "translate-x-5" : "translate-x-0.5"}`} />
+																</div>
+																<span className="text-xs font-medium text-stone-600">주요 이벤트</span>
+															</label>
+															{editEventMessage && (
+																<div className={`flex items-center space-x-2 text-xs px-3 py-2 rounded-xl ${editEventMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
+																	{editEventMessage.type === "success" ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+																	<span>{editEventMessage.text}</span>
+																</div>
+															)}
+															<div className="flex items-center space-x-2">
+																<button
+																	type="button"
+																	onClick={() => handleEventEdit(ev.id)}
+																	disabled={editEventLoading}
+																	className="flex items-center space-x-1 px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition disabled:opacity-50"
+																>
+																	<Save size={12} />
+																	<span>{editEventLoading ? "저장 중..." : "저장"}</span>
+																</button>
+																<button
+																	type="button"
+																	onClick={handleCancelEventEdit}
+																	className="px-4 py-1.5 border border-stone-200 text-stone-500 text-xs font-bold rounded-xl hover:bg-stone-50 transition"
+																>
+																	취소
+																</button>
+																<button
+																	type="button"
+																	onClick={() => handleEventDelete(ev.id)}
+																	className="px-4 py-1.5 border border-red-100 text-red-400 text-xs font-bold rounded-xl hover:bg-red-50 transition ml-auto"
+																>
+																	삭제
+																</button>
+															</div>
+														</div>
+													) : (
+														// Regular display
+														<div className="flex items-start justify-between p-3">
+															<div className="flex items-start space-x-3 flex-1 min-w-0 mr-2">
+																<span className={`flex-none mt-0.5 inline-block rounded-md px-2 py-0.5 text-xs font-bold ${ev.is_major ? "bg-emerald-600 text-white" : "bg-stone-200 text-stone-500"}`}>
+																	{ev.date}
+																</span>
+																<p className={`text-sm leading-relaxed ${ev.is_major ? "font-bold text-stone-800" : "text-stone-600"}`}>{ev.event_text}</p>
+															</div>
+															<div className="flex items-center space-x-1 flex-none">
+																<button
+																	onClick={() => handleStartEventEdit(ev)}
+																	className="p-1 text-stone-300 hover:text-emerald-500 transition"
+																	title="수정"
+																>
+																	<Edit3 size={13} />
+																</button>
+																<button
+																	onClick={() => handleEventDelete(ev.id)}
+																	className="p-1 text-stone-300 hover:text-red-500 transition"
+																	title="삭제"
+																>
+																	<Trash2 size={13} />
+																</button>
+															</div>
+														</div>
+													)}
 												</div>
 											))}
 										</div>
