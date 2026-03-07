@@ -1,3 +1,41 @@
+// ---- Supabase DB types ----
+
+export type ChurchNews = {
+	id: string;
+	title: string;
+	content: string;
+	image_urls: string[];
+	created_at: string;
+};
+
+export type Bulletin = {
+	id: string;
+	title: string;
+	date: string;
+	image_urls: string[];
+	created_at: string;
+};
+
+export type HistoryEra = {
+	id: string;
+	title: string;
+	period: string;
+	icon_name: string;
+	sort_order: number;
+};
+
+export type HistoryEvent = {
+	id: string;
+	era_id: string;
+	year: string;
+	date: string;
+	event_text: string;
+	is_major: boolean;
+	sort_order: number;
+};
+
+// ---- YouTube / Sermon types ----
+
 export interface SermonData {
 	id: string;
 	title: string;

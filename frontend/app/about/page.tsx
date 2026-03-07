@@ -116,10 +116,14 @@ export default function AboutPage() {
             isMajor: ev.is_major,
           });
         }
-        // Sort years descending
+        // Sort years descending (newest year first)
         const years = Array.from(yearMap.values()).sort((a, b) =>
           b.year.localeCompare(a.year),
         );
+        // Sort events within each year by date descending (e.g. "12.25" → "01.23")
+        years.forEach((yg) => {
+          yg.events.sort((a, b) => b.date.localeCompare(a.date));
+        });
         return {
           id: era.id,
           title: era.title,
