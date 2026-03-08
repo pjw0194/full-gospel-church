@@ -25,7 +25,7 @@ export default function Header() {
       Icon: Instagram,
     },
     {
-      href: "https://www.facebook.com/kansasfgc",
+      href: "https://www.facebook.com/people/%EC%BA%94%EC%82%AC%EC%8A%A4%EC%88%9C%EB%B3%B5%EC%9D%8C%EA%B5%90%ED%9A%8C/61573776143690/",
       label: "Facebook",
       Icon: Facebook,
     },
@@ -37,24 +37,24 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full h-16 bg-white border-b border-stone-100 flex items-center justify-center fixed top-0 z-50">
-      <div className="w-full max-w-5xl px-4 flex justify-between items-center">
+    <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-center border-b border-stone-100 bg-white">
+      <div className="flex w-full max-w-5xl items-center justify-between px-4">
         {/* Logo */}
         <TransitionLink
           href="/"
           className="flex flex-col items-start leading-none"
           onClick={() => setIsMenuOpen(false)}
         >
-          <span className="text-lg md:text-xl font-bold text-stone-800 tracking-tight">
-            캔사스 <span className="text-emerald-600">순복음 교회</span>
+          <span className="text-lg font-bold tracking-tight text-stone-800 md:text-xl">
+            캔사스<span className="text-emerald-600">순복음교회</span>
           </span>
-          <span className="text-[9px] md:text-[10px] text-stone-400 font-medium uppercase tracking-tighter mt-1">
+          <span className="mt-1 text-[9px] font-medium tracking-tighter text-stone-400 uppercase md:text-[10px]">
             Kansas Full Gospel Korean Church
           </span>
         </TransitionLink>
 
         {/* PC 내비게이션 */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden items-center gap-8 md:flex">
           <nav className="flex space-x-8 text-sm font-medium text-stone-600">
             {navItems.map((item) => (
               <TransitionLink
@@ -62,7 +62,7 @@ export default function Header() {
                 href={item.href}
                 className={`transition-colors ${
                   isActive(item.href)
-                    ? "text-emerald-600 font-bold"
+                    ? "font-bold text-emerald-600"
                     : "hover:text-emerald-600"
                 }`}
               >
@@ -78,7 +78,7 @@ export default function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="text-stone-400 hover:text-emerald-600 transition-colors"
+                className="text-stone-400 transition-colors hover:text-emerald-600"
               >
                 <Icon size={16} />
               </a>
@@ -88,7 +88,7 @@ export default function Header() {
 
         {/* 모바일 메뉴 버튼 */}
         <button
-          className="md:hidden text-stone-600 hover:text-emerald-600 transition"
+          className="text-stone-600 transition hover:text-emerald-600 md:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
         >
@@ -98,10 +98,10 @@ export default function Header() {
 
       {/* 모바일 드롭다운 */}
       <div
-        className={`absolute top-16 left-0 w-full bg-white border-b border-stone-100 shadow-lg md:hidden flex flex-col items-center py-6 space-y-6 transition-all duration-300 ease-in-out transform origin-top ${
+        className={`absolute top-16 left-0 flex w-full origin-top transform flex-col items-center space-y-6 border-b border-stone-100 bg-white py-6 shadow-lg transition-all duration-300 ease-in-out md:hidden ${
           isMenuOpen
-            ? "opacity-100 translate-y-0 visible"
-            : "opacity-0 -translate-y-5 invisible"
+            ? "visible translate-y-0 opacity-100"
+            : "invisible -translate-y-5 opacity-0"
         }`}
       >
         {navItems.map((item) => (
@@ -110,7 +110,7 @@ export default function Header() {
             href={item.href}
             className={`text-lg font-medium transition-colors ${
               isActive(item.href)
-                ? "text-emerald-600 font-bold"
+                ? "font-bold text-emerald-600"
                 : "text-stone-800 hover:text-emerald-600"
             }`}
             onClick={() => setIsMenuOpen(false)}
@@ -118,7 +118,7 @@ export default function Header() {
             {item.label}
           </TransitionLink>
         ))}
-        <div className="flex items-center gap-5 pt-5 border-t border-stone-100 w-full justify-center">
+        <div className="flex w-full items-center justify-center gap-5 border-t border-stone-100 pt-5">
           {socialLinks.map(({ href, label, Icon }) => (
             <a
               key={label}
@@ -126,7 +126,7 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="text-stone-400 hover:text-emerald-600 transition-colors"
+              className="text-stone-400 transition-colors hover:text-emerald-600"
             >
               <Icon size={22} />
             </a>
