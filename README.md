@@ -19,8 +19,6 @@ A full rebuild of the official website for **Kansas Full Gospel Church** (founde
 |---|---|
 | ![Before screenshot](docs/screenshots/before.png) | ![After screenshot](docs/screenshots/after.png) |
 
-> _Replace the placeholders above with actual screenshots._
-
 ---
 
 ## Features
