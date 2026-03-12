@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "캔사스순복음교회",
   description: "환영합니다.",
+  verification: {
+    google: "ieUtDJoHHZfOM8FWMY-vIH3DRmc30TTKbLTVdXHYbqk",
+  },
 };
 
 export default function RootLayout({
