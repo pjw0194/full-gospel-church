@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import ServiceSchedule from "@/components/sermons/ServiceSchedule";
 import SermonVideoGallery from "@/components/sermons/SermonVideoGallery";
+
+export const metadata: Metadata = {
+  title: "예배 / 설교 | 캔사스순복음교회",
+  description: "하나님께 드리는 거룩한 예배와 은혜로운 말씀의 자리에 초대합니다. 예배 시간 안내 및 설교 영상을 확인하세요.",
+};
 
 export default async function SermonsPage() {
 

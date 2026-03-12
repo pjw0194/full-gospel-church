@@ -1,7 +1,28 @@
+import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { Calendar, ChevronLeft, Images } from "lucide-react";
 import Link from "next/link";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const { data: post } = await supabase
+    .from("church_news")
+    .select("title, content")
+    .eq("id", id)
+    .single();
+
+  if (!post) return {};
+
+  return {
+    title: `${post.title} | 캔사스순복음교회`,
+    description: post.content?.slice(0, 120),
+  };
+}
 
 export const revalidate = 60;
 

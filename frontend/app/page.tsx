@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 import HeroSection from "@/components/home/HeroSection";
 import QuickAccess from "@/components/home/QuickAccess";
 import LatestSermon from "@/components/home/LatestSermon";

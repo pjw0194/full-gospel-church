@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { supabase, ChurchNews } from "@/lib/supabase";
+
+export const metadata: Metadata = {
+  title: "교회 소식 | 캔사스순복음교회",
+  description: "캔사스순복음교회의 주보와 최근 소식을 전해드립니다.",
+};
 import {
   Calendar,
   Images,
