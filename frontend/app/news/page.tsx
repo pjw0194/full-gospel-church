@@ -2,8 +2,15 @@ import type { Metadata } from "next";
 import { supabase, ChurchNews } from "@/lib/supabase";
 
 export const metadata: Metadata = {
-  title: "교회 소식 | 캔사스순복음교회",
-  description: "캔사스순복음교회의 주보와 최근 소식을 전해드립니다.",
+  title: "교회 소식",
+  description:
+    "캔사스순복음교회(KSFGC) 교회 소식과 주간 주보를 확인하세요. Kansas Full Gospel Church의 최신 공지사항, 행사 안내, 주보를 한인 교회 캔사스 커뮤니티에 전해드립니다.",
+  openGraph: {
+    title: "교회 소식 | 캔사스순복음교회",
+    description:
+      "캔사스순복음교회(KSFGC) 교회 소식과 주간 주보를 확인하세요. Kansas Full Gospel Church의 최신 공지사항, 행사 안내, 주보를 한인 교회 캔사스 커뮤니티에 전해드립니다.",
+    url: "https://ksfgc.com/news",
+  },
 };
 import {
   Calendar,

@@ -5,8 +5,15 @@ import ServiceSchedule from "@/components/sermons/ServiceSchedule";
 import SermonVideoGallery from "@/components/sermons/SermonVideoGallery";
 
 export const metadata: Metadata = {
-  title: "예배 / 설교 | 캔사스순복음교회",
-  description: "하나님께 드리는 거룩한 예배와 은혜로운 말씀의 자리에 초대합니다. 예배 시간 안내 및 설교 영상을 확인하세요.",
+  title: "예배 / 설교",
+  description:
+    "캔사스순복음교회(KSFGC) 예배 시간 안내와 설교 영상 아카이브입니다. Kansas Full Gospel Church의 한국어·영어 예배 일정 및 순복음 말씀 영상을 확인하세요.",
+  openGraph: {
+    title: "예배 / 설교 | 캔사스순복음교회",
+    description:
+      "캔사스순복음교회(KSFGC) 예배 시간 안내와 설교 영상 아카이브입니다. Kansas Full Gospel Church의 한국어·영어 예배 일정 및 순복음 말씀 영상을 확인하세요.",
+    url: "https://ksfgc.com/sermons",
+  },
 };
 
 export default async function SermonsPage() {
