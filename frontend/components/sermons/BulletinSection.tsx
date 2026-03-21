@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { ZoomIn, Calendar, ChevronRight, FileText } from "lucide-react";
 import BulletinModal from "@/components/common/BulletinModal";
 import { supabase, Bulletin } from "@/lib/supabase";
@@ -76,12 +75,11 @@ export default function BulletinSection() {
                 <div className="group relative bg-stone-900 rounded-[3rem] overflow-hidden shadow-xl aspect-[16/10] flex items-center justify-center">
                   {latest.image_urls?.[0] && (
                     <div className="absolute inset-0 opacity-40 group-hover:opacity-30 transition-opacity">
-                      <Image
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
                         src={latest.image_urls[0]}
                         alt="주보 미리보기"
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 60vw"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   )}
@@ -125,11 +123,10 @@ export default function BulletinSection() {
                         <div className="flex items-center space-x-3 min-w-0">
                           {item.image_urls?.[0] && (
                             <div className="w-10 h-10 rounded-xl overflow-hidden border border-stone-200 flex-none">
-                              <Image
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
                                 src={item.image_urls[0]}
                                 alt={item.title}
-                                width={40}
-                                height={40}
                                 className="object-cover w-full h-full"
                               />
                             </div>

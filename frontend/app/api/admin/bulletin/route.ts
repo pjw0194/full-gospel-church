@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin, verifyAdminToken } from "@/lib/supabase-server";
 
-const BUCKET = "bulletins";
-
-function extractStoragePath(url: string): string | null {
-	const marker = `/public/${BUCKET}/`;
-	const idx = url.indexOf(marker);
-	return idx !== -1 ? url.slice(idx + marker.length) : null;
-}
-
 export async function POST(request: NextRequest) {
 	if (!(await verifyAdminToken(request))) {
 		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
@@ -44,22 +36,6 @@ export async function PUT(request: NextRequest) {
 		return NextResponse.json({ error: "제목과 날짜를 입력해주세요." }, { status: 400 });
 	}
 
-	// Clean up removed images from storage
-	const { data: existing } = await supabaseAdmin
-		.from("bulletins")
-		.select("image_urls")
-		.eq("id", id)
-		.single();
-
-	if (existing?.image_urls?.length) {
-		const newUrls = new Set(image_urls ?? []);
-		const removed = (existing.image_urls as string[])
-			.filter((u) => !newUrls.has(u))
-			.map(extractStoragePath)
-			.filter((p): p is string => p !== null);
-		if (removed.length) await supabaseAdmin.storage.from(BUCKET).remove(removed);
-	}
-
 	const { data, error } = await supabaseAdmin
 		.from("bulletins")
 		.update({ title: title.trim(), date: date.trim(), image_urls: image_urls ?? [] })
@@ -80,19 +56,6 @@ export async function DELETE(request: NextRequest) {
 	}
 
 	const { id } = await request.json();
-
-	const { data: bulletin } = await supabaseAdmin
-		.from("bulletins")
-		.select("image_urls")
-		.eq("id", id)
-		.single();
-
-	if (bulletin?.image_urls?.length) {
-		const paths = (bulletin.image_urls as string[])
-			.map(extractStoragePath)
-			.filter((p): p is string => p !== null);
-		if (paths.length) await supabaseAdmin.storage.from(BUCKET).remove(paths);
-	}
 
 	const { error } = await supabaseAdmin.from("bulletins").delete().eq("id", id);
 
