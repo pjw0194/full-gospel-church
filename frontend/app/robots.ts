@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/api/"],
       },
     ],
-    sitemap: "https://ksfgc.com/sitemap.xml",
+    sitemap: "https://www.ksfgc.com/sitemap.xml",
   };
 }

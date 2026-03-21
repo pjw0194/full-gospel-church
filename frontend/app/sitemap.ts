@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
 
-const BASE_URL = "https://ksfgc.com";
+const BASE_URL = "https://www.ksfgc.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
