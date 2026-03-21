@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   verification: {
     google: "ieUtDJoHHZfOM8FWMY-vIH3DRmc30TTKbLTVdXHYbqk",
   },
+  alternates: {
+    canonical: "https://www.ksfgc.com",
+  },
 };
 
 export default function RootLayout({
