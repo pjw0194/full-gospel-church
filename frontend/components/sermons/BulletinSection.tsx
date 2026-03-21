@@ -17,7 +17,6 @@ export default function BulletinSection() {
       .from("bulletins")
       .select("*")
       .order("date", { ascending: false })
-      .limit(20)
       .then(({ data }) => {
         setBulletins(data ?? []);
         setLoading(false);
