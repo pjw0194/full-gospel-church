@@ -1,9 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ZoomIn, Calendar, ChevronRight, FileText } from "lucide-react";
+import { ZoomIn, Calendar, ChevronRight, Eye, FileText } from "lucide-react";
 import BulletinModal from "@/components/common/BulletinModal";
+import LazyImage from "@/components/common/LazyImage";
 import { supabase, Bulletin } from "@/lib/supabase";
+
+function toThumbnailUrl(url: string): string {
+  if (url.includes('drive.google.com/thumbnail')) return url;
+  const lh3Match = url.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
+  if (lh3Match) return `https://drive.google.com/thumbnail?id=${lh3Match[1]}&sz=w1000`;
+  const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveMatch) return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w1000`;
+  return url;
+}
 
 export default function BulletinSection() {
   const [bulletins, setBulletins] = useState<Bulletin[]>([]);
@@ -75,11 +85,12 @@ export default function BulletinSection() {
                 <div className="group relative bg-stone-900 rounded-[3rem] overflow-hidden shadow-xl aspect-[16/10] flex items-center justify-center">
                   {latest.image_urls?.[0] && (
                     <div className="absolute inset-0 opacity-40 group-hover:opacity-30 transition-opacity">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={latest.image_urls[0]}
+                      <LazyImage
+                        src={toThumbnailUrl(latest.image_urls[0])}
                         alt="주보 미리보기"
                         className="w-full h-full object-cover"
+                        wrapperClassName="w-full h-full"
+                        compact
                       />
                     </div>
                   )}
@@ -123,11 +134,12 @@ export default function BulletinSection() {
                         <div className="flex items-center space-x-3 min-w-0">
                           {item.image_urls?.[0] && (
                             <div className="w-10 h-10 rounded-xl overflow-hidden border border-stone-200 flex-none">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={item.image_urls[0]}
+                              <LazyImage
+                                src={toThumbnailUrl(item.image_urls[0])}
                                 alt={item.title}
                                 className="object-cover w-full h-full"
+                                wrapperClassName="w-full h-full"
+                                compact
                               />
                             </div>
                           )}
@@ -138,6 +150,11 @@ export default function BulletinSection() {
                             <p className="font-bold text-stone-700 truncate">
                               {item.title}
                             </p>
+                            {(item.view_count ?? 0) > 0 && (
+                              <span className="flex items-center gap-1 text-[10px] text-stone-300 mt-0.5">
+                                <Eye size={10} /> {item.view_count}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <ChevronRight

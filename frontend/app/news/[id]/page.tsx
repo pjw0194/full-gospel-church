@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
-import { Calendar, ChevronLeft, Images } from "lucide-react";
+import { Calendar, ChevronLeft, Eye, Images } from "lucide-react";
 import Link from "next/link";
+import NewsViewTracker from "@/components/news/NewsViewTracker";
 
 export async function generateMetadata({
   params,
@@ -55,6 +56,7 @@ export default async function NewsDetailPage({
 
   return (
     <main className="min-h-screen bg-white animate-in fade-in duration-500">
+      <NewsViewTracker id={id} />
       {/* Back button bar */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-4">
         <Link
@@ -80,6 +82,13 @@ export default async function NewsDetailPage({
                 <span className="text-stone-200">·</span>
                 <Images size={14} />
                 <span>사진 {images.length}장</span>
+              </>
+            )}
+            {(post.view_count ?? 0) > 0 && (
+              <>
+                <span className="text-stone-200">·</span>
+                <Eye size={14} />
+                <span>조회 {post.view_count}</span>
               </>
             )}
           </div>

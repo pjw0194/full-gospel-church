@@ -18,6 +18,7 @@ import {
   Newspaper,
   ChevronLeft,
   ChevronRight,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import BulletinSection from "@/components/sermons/BulletinSection";
@@ -48,7 +49,7 @@ export default async function NewsPage({
     supabase.from("church_news").select("id", { count: "exact", head: true }),
     supabase
       .from("church_news")
-      .select("id, title, image_urls, created_at")
+      .select("id, title, image_urls, created_at, view_count")
       .order("created_at", { ascending: false })
       .range(offset, offset + ITEMS_PER_PAGE - 1),
   ]);
@@ -136,11 +137,18 @@ export default async function NewsPage({
                             <Calendar size={11} />
                             <span>{formatDate(post.created_at)}</span>
                           </p>
-                          {post.image_urls?.length > 1 && (
-                            <span className="flex items-center gap-1 text-xs text-stone-300">
-                              <Images size={12} /> {post.image_urls.length}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {post.image_urls?.length > 1 && (
+                              <span className="flex items-center gap-1 text-xs text-stone-300">
+                                <Images size={12} /> {post.image_urls.length}
+                              </span>
+                            )}
+                            {(post.view_count ?? 0) > 0 && (
+                              <span className="flex items-center gap-1 text-xs text-stone-300">
+                                <Eye size={11} /> {post.view_count}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </article>

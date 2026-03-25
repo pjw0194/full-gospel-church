@@ -1,9 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { X, ChevronRight, ChevronLeft, Calendar, FileText, ZoomIn } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { X, ChevronRight, ChevronLeft, Calendar, Eye, FileText, ZoomIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bulletin } from "@/lib/supabase";
+import BulletinViewTracker from "@/components/bulletin/BulletinViewTracker";
+import LazyImage from "@/components/common/LazyImage";
+
+// Number of items on each side of selectedIdx that get thumbnails rendered.
+// Items outside this window show a lightweight placeholder to avoid mass image requests.
+const SIDEBAR_WINDOW = 10;
+
+function toThumbnailUrl(url: string): string {
+	if (url.includes('drive.google.com/thumbnail')) return url;
+	const lh3Match = url.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
+	if (lh3Match) return `https://drive.google.com/thumbnail?id=${lh3Match[1]}&sz=w1000`;
+	const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+	if (driveMatch) return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w1000`;
+	return url;
+}
 
 interface BulletinModalProps {
 	isOpen: boolean;
@@ -24,6 +39,9 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const [lightboxIdx, setLightboxIdx] = useState(0);
 
+	// Ref for the sidebar scroll container — used to auto-scroll the selected item into view
+	const sidebarScrollRef = useRef<HTMLDivElement>(null);
+
 	if (isOpen !== prevIsOpen || initialId !== prevInitialId) {
 		setPrevIsOpen(isOpen);
 		setPrevInitialId(initialId);
@@ -42,6 +60,14 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 			document.body.classList.remove("bulletin-modal-open");
 		};
 	}, [isOpen]);
+
+	// Scroll the selected sidebar item into view whenever selectedIdx changes
+	useEffect(() => {
+		const container = sidebarScrollRef.current;
+		if (!container) return;
+		const selected = container.querySelector<HTMLElement>(`[data-index="${selectedIdx}"]`);
+		selected?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+	}, [selectedIdx]);
 
 	const current = bulletins[selectedIdx];
 	const images = current?.image_urls ?? [];
@@ -109,6 +135,7 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 							className="relative z-10 w-full max-w-6xl bg-white rounded-4xl overflow-hidden shadow-2xl flex flex-col h-[90vh] md:h-[85vh]"
 						>
 							{/* Header */}
+							{current && <BulletinViewTracker id={current.id} />}
 							<div className="p-5 md:p-6 border-b border-stone-100 flex justify-between items-center bg-white shrink-0">
 								<div className="flex items-center space-x-3">
 									<div className="bg-emerald-50 p-2 rounded-xl text-emerald-600 hidden sm:block">
@@ -118,9 +145,16 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 										<h3 className="text-lg md:text-xl font-bold text-stone-800">
 											{current ? `${current.date} ${current.title}` : "주보"}
 										</h3>
-										<p className="text-[10px] md:text-xs text-stone-400 uppercase tracking-wider">
-											Kansas Full Gospel Church
-										</p>
+										<div className="flex items-center gap-2">
+											<p className="text-[10px] md:text-xs text-stone-400 uppercase tracking-wider">
+												Kansas Full Gospel Church
+											</p>
+											{(current?.view_count ?? 0) > 0 && (
+												<span className="flex items-center gap-1 text-[10px] md:text-xs text-stone-300">
+													<Eye size={11} /> {current?.view_count}
+												</span>
+											)}
+										</div>
 									</div>
 								</div>
 								<button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-full transition text-stone-500">
@@ -136,20 +170,22 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 								</div>
 							) : (
 								<div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-stone-50 min-h-0">
-									{/* Left: Scrollable images */}
+									{/* Left: Scrollable images — load eagerly (current bulletin only) */}
 									<div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 flex flex-col items-center">
 										{images.map((url, idx) => (
 											<div
-												key={idx}
+												key={`${current.id}-${idx}`}
 												className="relative w-full max-w-2xl group cursor-zoom-in"
 												onClick={() => openLightbox(idx)}
 											>
 												<div className="bg-white shadow-md rounded-2xl overflow-hidden border border-stone-200">
-													{/* eslint-disable-next-line @next/next/no-img-element */}
-													<img
-														src={url}
+													{/* eager: current bulletin pages load immediately, no mass IO firing */}
+													<LazyImage
+														src={toThumbnailUrl(url)}
 														alt={`${current.date} ${idx + 1}페이지`}
-														className="w-full h-auto"
+														className="w-full h-auto block"
+														wrapperClassName="w-full"
+														eager
 													/>
 												</div>
 												<div className="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
@@ -177,40 +213,60 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 											</span>
 										</div>
 
-										<div className="flex-1 overflow-y-auto p-3 space-y-1.5">
-											{bulletins.map((item, idx) => (
-												<button
-													key={item.id}
-													onClick={() => setSelectedIdx(idx)}
-													className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all group ${
-														selectedIdx === idx
-															? "bg-emerald-50 border border-emerald-100"
-															: "hover:bg-stone-50 border border-transparent"
-													}`}
-												>
-													<div className="flex items-center space-x-3 min-w-0">
-														{item.image_urls?.[0] && (
-															<div className="w-9 h-9 rounded-lg overflow-hidden border border-stone-200 flex-none">
-																{/* eslint-disable-next-line @next/next/no-img-element */}
-																<img src={item.image_urls[0]} alt="" className="w-full h-full object-cover" />
+										{/* Windowed list: only render thumbnails for items within ±SIDEBAR_WINDOW of selectedIdx.
+										    Items outside show a lightweight placeholder so we never fire 100+ image requests at once. */}
+										<div ref={sidebarScrollRef} className="flex-1 overflow-y-auto p-3 space-y-1.5">
+											{bulletins.map((item, idx) => {
+												const inWindow = Math.abs(idx - selectedIdx) <= SIDEBAR_WINDOW;
+												return (
+													<button
+														key={item.id}
+														data-index={idx}
+														onClick={() => setSelectedIdx(idx)}
+														className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all group ${
+															selectedIdx === idx
+																? "bg-emerald-50 border border-emerald-100"
+																: "hover:bg-stone-50 border border-transparent"
+														}`}
+													>
+														<div className="flex items-center space-x-3 min-w-0">
+															{item.image_urls?.[0] && (
+																<div className="w-9 h-9 rounded-lg overflow-hidden border border-stone-200 flex-none">
+																	{inWindow ? (
+																		<LazyImage
+																			src={toThumbnailUrl(item.image_urls[0])}
+																			alt=""
+																			className="w-full h-full object-cover"
+																			wrapperClassName="w-full h-full"
+																			compact
+																		/>
+																	) : (
+																		<div className="w-full h-full bg-stone-100" />
+																	)}
+																</div>
+															)}
+															<div className="text-left min-w-0">
+																<p className={`text-[10px] font-bold mb-0.5 ${selectedIdx === idx ? "text-emerald-600" : "text-stone-400"}`}>
+																	{item.date}
+																</p>
+																<p className={`font-bold text-sm truncate ${selectedIdx === idx ? "text-emerald-900" : "text-stone-700"}`}>
+																	{item.title}
+																</p>
+																{(item.view_count ?? 0) > 0 && (
+																	<span className="flex items-center gap-1 text-[10px] text-stone-300 mt-0.5">
+																		<Eye size={10} /> {item.view_count}
+																	</span>
+																)}
 															</div>
-														)}
-														<div className="text-left min-w-0">
-															<p className={`text-[10px] font-bold mb-0.5 ${selectedIdx === idx ? "text-emerald-600" : "text-stone-400"}`}>
-																{item.date}
-															</p>
-															<p className={`font-bold text-sm truncate ${selectedIdx === idx ? "text-emerald-900" : "text-stone-700"}`}>
-																{item.title}
-															</p>
 														</div>
-													</div>
-													{selectedIdx === idx ? (
-														<div className="w-2 h-2 bg-emerald-500 rounded-full flex-none ml-2" />
-													) : (
-														<ChevronRight size={14} className="text-stone-300 group-hover:text-emerald-500 transition flex-none ml-2" />
-													)}
-												</button>
-											))}
+														{selectedIdx === idx ? (
+															<div className="w-2 h-2 bg-emerald-500 rounded-full flex-none ml-2" />
+														) : (
+															<ChevronRight size={14} className="text-stone-300 group-hover:text-emerald-500 transition flex-none ml-2" />
+														)}
+													</button>
+												);
+											})}
 										</div>
 									</div>
 								</div>
@@ -281,11 +337,12 @@ const BulletinModal: React.FC<BulletinModalProps> = ({
 							onTouchStart={handleTouchStart}
 							onTouchEnd={handleTouchEnd}
 						>
-							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img
-								src={images[lightboxIdx]}
+							<LazyImage
+								src={toThumbnailUrl(images[lightboxIdx])}
 								alt={`${current?.date ?? ""} ${lightboxIdx + 1}페이지`}
 								className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
+								wrapperClassName="flex items-center justify-center"
+								eager
 							/>
 						</motion.div>
 					</div>

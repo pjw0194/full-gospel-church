@@ -6,6 +6,7 @@ export type ChurchNews = {
 	content: string;
 	image_urls: string[];
 	created_at: string;
+	view_count?: number;
 };
 
 export type Bulletin = {
@@ -14,6 +15,7 @@ export type Bulletin = {
 	date: string;
 	image_urls: string[];
 	created_at: string;
+	view_count?: number;
 };
 
 export type HistoryEra = {
