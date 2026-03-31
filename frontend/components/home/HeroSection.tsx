@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="sticky top-0 z-0 h-[52vh] md:h-[70vh] w-full flex items-center justify-center bg-gray-900 text-white overflow-hidden">
+    <section className="sticky top-0 z-0 h-[52vh] md:h-[70vh] w-full flex items-center justify-center bg-stone-900 text-white overflow-hidden">
       <div className="absolute inset-0 bg-black/50 z-0">
         <Image
           src="/images/IMG_2982.jpeg"
@@ -20,7 +20,7 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-20 text-center px-6 max-w-4xl mx-auto">
-        <h2 className="text-sm md:text-xl font-light mb-3 tracking-wider text-gray-200">
+        <h2 className="text-sm md:text-xl font-light mb-3 tracking-wider text-stone-200">
           KANSAS FULL GOSPEL CHURCH
         </h2>
         <h1 className="text-3xl md:text-6xl font-bold mb-6 leading-tight">
@@ -31,7 +31,7 @@ export default function HeroSection() {
         <div className="flex flex-row gap-3 justify-center">
           <TransitionLink
             href="/about"
-            className="px-6 py-2.5 md:px-8 md:py-3 bg-white text-gray-900 font-bold rounded-full hover:bg-gray-100 transition shadow-lg text-sm md:text-base"
+            className="px-6 py-2.5 md:px-8 md:py-3 bg-white text-stone-900 font-bold rounded-full hover:bg-stone-100 transition shadow-lg text-sm md:text-base"
           >
             교회 소개
           </TransitionLink>

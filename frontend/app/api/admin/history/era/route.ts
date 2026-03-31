@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin, verifyAdminToken } from "@/lib/supabase-server";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function POST(request: NextRequest) {
 	if (!(await verifyAdminToken(request))) {
 		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
@@ -43,7 +45,10 @@ export async function PUT(request: NextRequest) {
 
 	const { id, title, period, icon_name, sort_order } = await request.json();
 
-	if (!id || !title?.trim() || !period?.trim() || !icon_name?.trim()) {
+	if (!id || !UUID_RE.test(id)) {
+		return NextResponse.json({ error: "잘못된 ID입니다." }, { status: 400 });
+	}
+	if (!title?.trim() || !period?.trim() || !icon_name?.trim()) {
 		return NextResponse.json({ error: "이름, 기간, 아이콘을 모두 입력해주세요." }, { status: 400 });
 	}
 
@@ -74,6 +79,10 @@ export async function DELETE(request: NextRequest) {
 	}
 
 	const { id } = await request.json();
+
+	if (!id || !UUID_RE.test(id)) {
+		return NextResponse.json({ error: "잘못된 ID입니다." }, { status: 400 });
+	}
 
 	// CASCADE delete will also remove all child events (set in migration)
 	const { error } = await supabaseAdmin

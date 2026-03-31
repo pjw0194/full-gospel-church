@@ -31,8 +31,14 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ error: "파일 크기는 10MB 이하여야 합니다." }, { status: 400 });
 	}
 
-	const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-	const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+	const extMap: Record<string, string> = {
+		"image/jpeg": "jpg",
+		"image/png": "png",
+		"image/gif": "gif",
+		"image/webp": "webp",
+	};
+	const ext = extMap[file.type] ?? "jpg";
+	const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
 	const bytes = await file.arrayBuffer();
 
 	const { error } = await supabaseAdmin.storage

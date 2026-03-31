@@ -30,7 +30,7 @@ export default function DailyVerse() {
 						Today&apos;s Word
 					</div>
 
-					<h3 className="text-xl md:text-2xl font-bold leading-relaxed text-gray-800">
+					<h3 className="text-xl md:text-2xl font-bold leading-relaxed text-stone-800">
 						&quot;{verse.text}&quot;
 					</h3>
 					<p className="text-emerald-600 font-medium text-base italic">

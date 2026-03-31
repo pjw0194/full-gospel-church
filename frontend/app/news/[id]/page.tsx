@@ -5,12 +5,16 @@ import { Calendar, ChevronLeft, Eye, Images } from "lucide-react";
 import Link from "next/link";
 import NewsViewTracker from "@/components/news/NewsViewTracker";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  if (!UUID_RE.test(id)) return {};
+
   const { data: post } = await supabase
     .from("church_news")
     .select("title, content")
@@ -43,6 +47,8 @@ export default async function NewsDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  if (!UUID_RE.test(id)) notFound();
 
   const { data: post } = await supabase
     .from("church_news")

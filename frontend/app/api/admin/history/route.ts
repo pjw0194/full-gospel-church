@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin, verifyAdminToken } from "@/lib/supabase-server";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_TEXT = 1000;
+
 export async function POST(request: NextRequest) {
 	if (!(await verifyAdminToken(request))) {
 		return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
@@ -8,8 +11,14 @@ export async function POST(request: NextRequest) {
 
 	const { era_id, year, date, event_text, is_major } = await request.json();
 
-	if (!era_id || !year?.trim() || !date?.trim() || !event_text?.trim()) {
+	if (!era_id || !UUID_RE.test(era_id)) {
+		return NextResponse.json({ error: "잘못된 시대 ID입니다." }, { status: 400 });
+	}
+	if (!year?.trim() || !date?.trim() || !event_text?.trim()) {
 		return NextResponse.json({ error: "모든 필드를 입력해주세요." }, { status: 400 });
+	}
+	if (event_text.trim().length > MAX_TEXT) {
+		return NextResponse.json({ error: "내용이 너무 깁니다." }, { status: 400 });
 	}
 
 	// Get max sort_order for this era+year combination
@@ -50,6 +59,10 @@ export async function DELETE(request: NextRequest) {
 
 	const { id } = await request.json();
 
+	if (!id || !UUID_RE.test(id)) {
+		return NextResponse.json({ error: "잘못된 ID입니다." }, { status: 400 });
+	}
+
 	const { error } = await supabaseAdmin
 		.from("church_history_events")
 		.delete()
@@ -69,8 +82,14 @@ export async function PUT(request: NextRequest) {
 
 	const { id, year, date, event_text, is_major } = await request.json();
 
-	if (!id || !year?.trim() || !date?.trim() || !event_text?.trim()) {
+	if (!id || !UUID_RE.test(id)) {
+		return NextResponse.json({ error: "잘못된 ID입니다." }, { status: 400 });
+	}
+	if (!year?.trim() || !date?.trim() || !event_text?.trim()) {
 		return NextResponse.json({ error: "모든 필드를 입력해주세요." }, { status: 400 });
+	}
+	if (event_text.trim().length > MAX_TEXT) {
+		return NextResponse.json({ error: "내용이 너무 깁니다." }, { status: 400 });
 	}
 
 	const { data, error } = await supabaseAdmin

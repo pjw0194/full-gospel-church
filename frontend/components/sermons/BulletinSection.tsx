@@ -48,7 +48,7 @@ export default function BulletinSection() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-start md:flex-row justify-between items- mb-12 gap-6">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl font-bold text-stone-900 mb-4">
                 주간 주보
               </h2>
               <p className="text-stone-500">
@@ -114,7 +114,7 @@ export default function BulletinSection() {
 
               {/* Archive List */}
               <div className="lg:col-span-5 bg-white rounded-[3rem] p-8 border border-stone-100 shadow-sm flex flex-col">
-                <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center justify-between">
+                <h4 className="text-xl font-bold text-stone-900 mb-6 flex items-center justify-between">
                   지난 주보 아카이브
                   <Calendar size={20} className="text-stone-300" />
                 </h4>
