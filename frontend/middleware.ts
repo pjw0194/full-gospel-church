@@ -30,7 +30,8 @@ export function middleware(request: NextRequest) {
 	}
 
 	// Redirect any page path ending with /admin or /admin/... to /admin
-	if (/\/.+\/admin(\/.*)?$/.test(pathname)) {
+	// Exclude /api/* routes from this redirect
+	if (!pathname.startsWith("/api/") && /\/.+\/admin(\/.*)?$/.test(pathname)) {
 		return NextResponse.redirect(new URL("/admin", request.url));
 	}
 	return NextResponse.next();
