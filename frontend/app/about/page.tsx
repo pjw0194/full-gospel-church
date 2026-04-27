@@ -119,7 +119,7 @@ export default function AboutPage() {
     ordainedDeacon: {
       name: "이병우",
       role: "안수집사",
-      image: "/images/members/이병우%20안수집사.jpg",
+      image: "/images/members/이병우%20안수집사.png",
     },
     deaconesses: [
       {
