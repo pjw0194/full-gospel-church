@@ -16,7 +16,7 @@ import ChurchHistorySection from "@/components/about/ChurchHistorySection";
 interface MemberProps {
   name: string;
   role: string;
-  image: string;
+  image?: string;
   isLarge?: boolean;
 }
 
@@ -32,13 +32,23 @@ const MemberCard: React.FC<MemberProps> = ({
     <div
       className={`relative overflow-hidden rounded-full border-4 border-white shadow-lg ${isLarge ? "h-40 w-40 md:h-56 md:w-56" : "h-32 w-32 md:h-40 md:w-40"} mb-5 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl`}
     >
-      <Image
-        src={image}
-        alt={name}
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 128px, 224px"
-      />
+      {image ? (
+        <Image
+          src={image}
+          alt={name}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 128px, 224px"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-stone-100">
+          <span
+            className={`font-bold text-stone-400 ${isLarge ? "text-4xl" : "text-2xl"}`}
+          >
+            {name[0]}
+          </span>
+        </div>
+      )}
       <div className="absolute inset-0 bg-emerald-900/0 transition-colors group-hover:bg-emerald-900/10" />
     </div>
     <h4
@@ -62,56 +72,148 @@ export default function AboutPage() {
     activeElder: {
       name: "류상선",
       role: "시무장로",
-      image: "/images/members/류상선.jpg",
+      image: "/images/members/류상선%20장로.png",
     },
     honoraryElders: [
       {
         name: "김남윤",
         role: "명예장로",
-        image: "/images/members/김남윤장로.jpg",
+        image: "/images/members/김남윤%20장로.png",
       },
       {
         name: "김창룡",
         role: "명예장로",
-        image: "/images/members/김창룡장로.jpg",
+        image: "/images/members/김창룡%20장로.png",
       },
       {
         name: "유귀곤",
         role: "명예장로",
-        image: "/images/members/유귀곤장로.jpg",
+        image: "/images/members/유귀곤%20장로.png",
       },
       {
         name: "양호석",
         role: "명예장로",
-        image: "/images/members/양호석장로.jpg",
+        image: "/images/members/양호석%20장로.png",
       },
       {
         name: "이돈화",
         role: "명예장로",
-        image: "/images/members/이돈화장로.jpg",
+        image: "/images/members/이돈화%20장로.png",
       },
       {
         name: "임명찬",
         role: "명예장로",
-        image: "/images/members/임명찬장로.jpg",
+        image: "/images/members/임명찬%20장로.png",
       },
       {
         name: "Boyce Gunter",
         role: "명예장로",
-        image: "/images/members/BoyceGunter.jpg",
+        image: "/images/members/Boyce%20Gunter%20장로.png",
       },
     ],
     retiredElder: {
       name: "이태훈",
       role: "은퇴장로",
-      image: "/images/members/이태훈장로.jpg",
+      image: "/images/members/이태훈%20장로.jpg",
     },
     ordainedDeacon: {
       name: "이병우",
       role: "안수집사",
-      image: "/images/members/이병우안수집사.jpg",
+      image: "/images/members/이병우%20안수집사.jpg",
     },
-    ministers: [],
+    deaconesses: [
+      {
+        name: "조문수",
+        role: "권사",
+        image: "/images/members/조문수%20권사.png",
+      },
+      { name: "최광자", role: "권사" },
+      {
+        name: "김순희",
+        role: "권사",
+        image: "/images/members/김순희%20권사.png",
+      },
+      { name: "이혜숙", role: "권사" },
+      { name: "류복순", role: "권사" },
+      { name: "이호숙", role: "권사" },
+      {
+        name: "황보종순",
+        role: "권사",
+        image: "/images/members/황보종순%20권사.png",
+      },
+      {
+        name: "양윤옥",
+        role: "권사",
+        image: "/images/members/양윤옥%20권사.png",
+      },
+      {
+        name: "류민선",
+        role: "권사",
+        image: "/images/members/류민선%20권사.png",
+      },
+      {
+        name: "배인순",
+        role: "권사",
+        image: "/images/members/배인순%20권사.png",
+      },
+      {
+        name: "윤정선",
+        role: "권사",
+        image: "/images/members/윤정선%20권사.png",
+      },
+      {
+        name: "박선자",
+        role: "권사",
+        image: "/images/members/박선자%20권사.png",
+      },
+      {
+        name: "이소피아",
+        role: "권사",
+        image: "/images/members/이소피아%20권사.png",
+      },
+      {
+        name: "전경미",
+        role: "권사",
+        image: "/images/members/전경미%20권사.png",
+      },
+    ],
+    officers: [
+      {
+        name: "류상선",
+        role: "예배부장",
+        image: "/images/members/류상선%20장로.png",
+      },
+      {
+        name: "김창룡",
+        role: "전도부장",
+        image: "/images/members/김창룡%20장로.png",
+      },
+      {
+        name: "유귀곤",
+        role: "교육부장",
+        image: "/images/members/유귀곤%20장로.png",
+      },
+      {
+        name: "양호석",
+        role: "규정위원장",
+        image: "/images/members/양호석%20장로.png",
+      },
+      {
+        name: "이돈화",
+        role: "교회이전위원장",
+        image: "/images/members/이돈화%20장로.png",
+      },
+      {
+        name: "서상교",
+        role: "남선교회 회장",
+        image: "/images/members/서상교%20집사.jpeg",
+      },
+      {
+        name: "배인순",
+        role: "여선교회 회장",
+        image: "/images/members/배인순%20권사.png",
+      },
+    ],
   };
 
   const pastPastors = [
@@ -418,6 +520,40 @@ export default function AboutPage() {
               </h3>
               <div className="flex justify-center">
                 <MemberCard {...leaders.ordainedDeacon} />
+              </div>
+            </div>
+
+            {/* 권사 그룹 */}
+            <div className="rounded-[3rem] border border-stone-100 bg-stone-50/50 p-8 md:p-16">
+              <div className="mb-16 flex flex-col items-center">
+                <div className="mb-6 h-px w-full max-w-xs bg-stone-200"></div>
+                <h3 className="text-2xl font-bold text-stone-800">권사회</h3>
+                <p className="font-eng mt-1 text-sm tracking-widest text-stone-400 uppercase">
+                  The Deaconesses
+                </p>
+              </div>
+              <div className="grid grid-cols-2 justify-items-center gap-x-8 gap-y-16 md:grid-cols-4 lg:grid-cols-5">
+                {leaders.deaconesses.map((member, idx) => (
+                  <MemberCard key={idx} {...member} />
+                ))}
+              </div>
+            </div>
+
+            {/* 2026년도 기관장·부서장·위원장 */}
+            <div className="rounded-[3rem] border border-stone-100 bg-stone-50/50 p-8 md:p-16">
+              <div className="mb-16 flex flex-col items-center">
+                <div className="mb-6 h-px w-full max-w-xs bg-stone-200"></div>
+                <h3 className="text-2xl font-bold text-stone-800">
+                  2026년도 기관장·부서장·위원장
+                </h3>
+                <p className="font-eng mt-1 text-sm tracking-widest text-stone-400 uppercase">
+                  2026 Department Leaders
+                </p>
+              </div>
+              <div className="grid grid-cols-2 justify-items-center gap-x-8 gap-y-16 md:grid-cols-4 lg:grid-cols-4">
+                {leaders.officers.map((member, idx) => (
+                  <MemberCard key={idx} {...member} />
+                ))}
               </div>
             </div>
           </div>
