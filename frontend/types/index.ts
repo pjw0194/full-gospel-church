@@ -50,15 +50,6 @@ export interface BibleVerse {
 	ref: string; // Bible verse
 }
 
-export interface YouTubeEntry {
-	"yt:videoId": string;
-	title: string;
-	published: string;
-	"media:group": {
-		"media:description"?: string;
-	};
-}
-
 export interface YouTubeSnippet {
 	publishedAt: string;
 	channelId: string;

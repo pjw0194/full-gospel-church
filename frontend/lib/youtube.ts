@@ -1,56 +1,64 @@
-import { XMLParser } from "fast-xml-parser";
 import {
   SermonData,
   SermonListResponse,
   YouTubeApiResponse,
-  YouTubeEntry,
   YouTubePlaylistItem,
 } from "@/types";
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 const PLAYLIST_ID = "PLJ1pbNfyrkV5YJu7Erl6OmGUJFpyPbOR8";
-const RSS_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
 const BASE_URL = "https://www.googleapis.com/youtube/v3/playlistItems";
 
 export async function getLatestSermon(): Promise<SermonData | null> {
+  if (!API_KEY) {
+    console.error("YouTube API Key is Missing");
+    return null;
+  }
+
   try {
-    const response = await fetch(RSS_URL, { next: { revalidate: 3600 } }); // Cache for 1 hour
-    const xmlText = await response.text();
+    const url = new URL(BASE_URL);
+    url.searchParams.append("part", "snippet");
+    url.searchParams.append("playlistId", PLAYLIST_ID);
+    url.searchParams.append("maxResults", "5");
+    url.searchParams.append("key", API_KEY);
 
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      attributeNamePrefix: "@_",
+    const response = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
     });
-    const result = parser.parse(xmlText);
 
-    // Sort entries by published date descending to ensure the latest video is first
-    const rawEntries = result.feed.entry;
-    const entries: YouTubeEntry[] = Array.isArray(rawEntries)
-      ? rawEntries
-      : rawEntries
-        ? [rawEntries]
-        : [];
-    entries.sort(
-      (a, b) =>
-        new Date(b.published).getTime() - new Date(a.published).getTime(),
+    if (!response.ok) {
+      console.error(`YouTube API Error: ${response.status}`);
+      return null;
+    }
+
+    const data: YouTubeApiResponse = await response.json();
+    const items = data.items || [];
+
+    // Filter out deleted/private videos, then sort by publishedAt descending
+    const validItems = items.filter(
+      (item) =>
+        item.snippet.resourceId &&
+        item.snippet.title !== "Deleted video" &&
+        item.snippet.title !== "Private video",
     );
-    const entry: YouTubeEntry = entries[0];
+    validItems.sort(
+      (a, b) =>
+        new Date(b.snippet.publishedAt).getTime() -
+        new Date(a.snippet.publishedAt).getTime(),
+    );
 
-    if (!entry) return null;
+    const item = validItems[0];
+    if (!item) return null;
 
-    const videoId = entry["yt:videoId"];
-    const fullTitle = entry.title;
-    const rawDescription = entry["media:group"]["media:description"] || "";
-    const publishedAt = entry.published;
-
+    const snippet = item.snippet;
     const { title, date, description } = parseSermonData(
-      fullTitle,
-      rawDescription,
-      publishedAt,
+      snippet.title,
+      snippet.description,
+      snippet.publishedAt,
     );
 
     return {
-      id: videoId,
+      id: snippet.resourceId.videoId,
       title,
       date,
       description,
