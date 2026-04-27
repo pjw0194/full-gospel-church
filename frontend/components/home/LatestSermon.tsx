@@ -4,12 +4,9 @@ import TransitionLink from "@/components/common/TransitionLink";
 export default async function LatestSermon() {
 	const sermon = await getLatestSermon();
 
-	const data = sermon || {
-		id: "BYt9TwDeVBE",
-		title: "무엇을? 어떻게? 전할 것인가?(복음의 핵심)",
-		date: "2026-1-23",
-		description: "본문: 사도행전 13장 17절~23절\n설교자: 권세열 목사",
-	};
+	if (!sermon) return null;
+
+	const data = sermon;
 
 	return (
 		<section className="py-16 sm:py-20 bg-stone-50">

@@ -23,7 +23,18 @@ export async function getLatestSermon(): Promise<SermonData | null> {
     });
     const result = parser.parse(xmlText);
 
-    const entry: YouTubeEntry = result.feed.entry[0]; // Get the first (latest) video
+    // Sort entries by published date descending to ensure the latest video is first
+    const rawEntries = result.feed.entry;
+    const entries: YouTubeEntry[] = Array.isArray(rawEntries)
+      ? rawEntries
+      : rawEntries
+        ? [rawEntries]
+        : [];
+    entries.sort(
+      (a, b) =>
+        new Date(b.published).getTime() - new Date(a.published).getTime(),
+    );
+    const entry: YouTubeEntry = entries[0];
 
     if (!entry) return null;
 
