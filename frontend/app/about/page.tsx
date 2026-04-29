@@ -98,7 +98,7 @@ export default function AboutPage() {
       {
         name: "이돈화",
         role: "명예장로",
-        image: "/images/members/이돈화%20장로.png",
+        image: "/images/members/이돈화%20장로.jpeg",
       },
       {
         name: "임명찬",
